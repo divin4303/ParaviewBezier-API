@@ -12,7 +12,7 @@ output: vtk file
 import numpy as np
 import os
 import sys
-import Bezier_driver
+import mesh_bezier
 import File_Info
 import Mesh
 import unstructured_paraview as upar
@@ -85,7 +85,7 @@ for i in range(len(Node_info)):
         t0.append(time.time())
         
         BezPoints,wbez,numpbez,ixbez,nen,temp_tnel=\
-        Bezier_driver.bez_patch(ndm,nel,mel,lel,n,m,l,p,q,r,knot_r,knot_s,\
+        mesh_bezier.bez_patch(ndm,nel,mel,lel,n,m,l,p,q,r,knot_r,knot_s,\
                                     knot_t,conn,wght,x,BezPoints,wbez,numpbez)
         t0.append(time.time())
         
