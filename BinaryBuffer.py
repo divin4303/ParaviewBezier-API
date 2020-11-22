@@ -7,7 +7,7 @@ class BinaryBuffer:
 
     def __init__(self, filepath=None):
         self.filepath_ = None #initialization of path'_'
-        self.sizes_ = []  #initialization of size'_'
+        self.sizes_ = []  #initialization of size'_'sizes_
         self.load(filepath)#loading the file
 		
     def read_number(self, start, dtype):
@@ -18,7 +18,16 @@ class BinaryBuffer:
 
     def read_text(self, start, length, step=1, encoding='ascii'):
         return self.mv_[start:start+length:step].tobytes().decode(encoding)
-
+    
+    def get_size(self):
+        return self.sizes_ #sizes_
+    
+    def get_mv(self):
+        return self.mv_
+    
+    def set_mv(self,sizes: int,buffer):
+        self.sizes_ = sizes #sizes_
+        self.mv_ = buffer
 
     def load(self, filepath=None):
 
@@ -29,7 +38,6 @@ class BinaryBuffer:
 
         sizes = [os.path.getsize(path) for path in filepath]
         self.memorysize = sum(sizes)
-        print(self.memorysize)
         # allocate memory
         buffer = memoryview(bytearray(b'0'*self.memorysize))
 
@@ -39,5 +47,5 @@ class BinaryBuffer:
                 fp.readinto(buffer[sizes_tmp[i_path]:])
 
         self.filepath_ = filepath
-        self.sizes_ = sizes
+        self.sizes_ = sizes #sizes_
         self.mv_ = buffer
