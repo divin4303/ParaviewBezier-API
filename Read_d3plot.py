@@ -3,6 +3,7 @@ import glob
 import numpy as np
 from BinaryBuffer import*
 import Headers
+import mmap
 
 path=[]
 
@@ -103,52 +104,124 @@ def _compute_n_bytes_per_state(header, wordsize):
     var_offset=1+header["nglbv"]
     
     return n_bytes_per_state,var_offset
+###############################################################
+def collect_file_infos(path,geometry_section_size: int,size_per_state: int):
+    
+    last_nz=0
+    bb = BinaryBuffer([path[0]])
+    
+    last_byte=bb.get_size()[0]
+    mv=bb.get_mv()
+    mview_inv_arr = np.asarray(mv[::-1])
+    
+    block_size=2048
+    
+    for i in range(0,last_byte,block_size):
+        
+        nz,=np.nonzero(mview_inv_arr[i:i+block_size])
+        
+        if len(nz):
+            last_nz=last_byte-(i+nz[0])
+            break
+    state_after_geo=(last_nz-geometry_section_size)//size_per_state
+    
+    memory_infos = [{
+            "start": geometry_section_size,
+            "length": state_after_geo * size_per_state,
+            "offset": 0,
+            "filepath": path[0],
+            "n_states": state_after_geo
+        }]
+    
+    
+    'need a for loop to loop through files'
+    for file in path[1:]:
+
+        with open(file,'rb') as f:
+        
+            last_nonzero_byte_index = -1
+            size_per_state=81600
+            file_size=os.path.getsize(file)
+            
+            n_blocks = file_size // mmap.ALLOCATIONGRANULARITY
+            rest_size = file_size % mmap.ALLOCATIONGRANULARITY
+            block_length = mmap.ALLOCATIONGRANULARITY
+            
+            if rest_size:
+                
+                start=n_blocks*block_length
+                mview = memoryview(mmap.mmap(f.fileno(),offset=start,length=rest_size,
+                                             access=mmap.ACCESS_READ).read())
+                nz_indexes, = np.nonzero(mview[::-1])
+                if len(nz_indexes):
+                    last_nonzero_byte_index = start + rest_size - nz_indexes[0]
+                
+            n_states_in_file = last_nonzero_byte_index // size_per_state
+            rest=last_nonzero_byte_index % size_per_state
+                
+            memory_infos.append({
+            "start": 0,
+            "length": n_states_in_file * size_per_state,
+            "offset": 0,
+            "filepath": file,
+            "n_states": n_states_in_file
+            })
+                
+    return memory_infos
+
+def read_state_data(memory_infos: dict):
+    n_states = sum(map(lambda x: x["n_states"], memory_infos))
+
+    memory_required = 0
+    for mem in memory_infos:
+        memory_required += int(mem["length"])
+    mview = memoryview(bytearray(memory_required))
+
+    total_offset = 0
+    for minfo in memory_infos:
+        start = minfo["start"]
+        length = minfo["length"]
+        filepath = minfo["filepath"]
+        
+        with open(filepath, "br") as fp:
+            fp.seek(start)
+            fp.readinto(mview[total_offset:total_offset + length])
+
+        total_offset += length
+        n_states += minfo["n_states"]
+
+    bb_states = BinaryBuffer()
+    bb_states.set_mv(memory_required,mview)
+
+    state_data = bb_states.read_ndarray(0, memory_required, 1, np.float64)
+    state_data = state_data.reshape((n_states, -1))
+    
+    return state_data,n_states
 #########S###############################################
 def read_d3plot(ndf=3,n=5,m=5,l=1):
+    x_disp=[]
     
     head,geometry_section_size=Headers._read_header(bb)
     geometry_section_size=_read_geometry_data(head,geometry_section_size)
     geometry_section_size=Headers._read_user_ids(head,geometry_section_size,bb)
 
     bytes_per_state,var_offset=_compute_n_bytes_per_state(head, word)
-
-    position=bb.sizes_[0]
-    EOF=find_EOF(position)
     
-    array_length=EOF-position
-    no_of_states=(EOF-position)/bytes_per_state
+    memory_infos=collect_file_infos(path,geometry_section_size,bytes_per_state)
+    
+    state_data,n_states=read_state_data(memory_infos)
     numnp=n*m*l
-    index_per_state=int(bytes_per_state/8)-var_offset-(numnp*ndf)
-    nparts=_get_n_parts(head)
-    nnodes=head['numnp']
-    
-    print('offset',var_offset,index_per_state)
-    
-    i,state=0,0
-    x_disp=([]) 
-    
-    state_data = bb.read_ndarray(position, array_length, 1, float_type)
-    
-    while state!=int(no_of_states):
+   
+    for i in range(n_states):
         
-        print(state_data[i])
-        i+=var_offset #(1+'nlgbv')
+        index=var_offset #(1+'nlgbv')
         for j in range(numnp):
             for k in range(ndf):
-                x_disp.append(state_data[i])
-                i+=1
-        state+=1
-        i+=index_per_state #10104
-    
-    i=i-2744
-    
-    i+=var_offset
-    for j in range(numnp):
-        for k in range(ndf):
-            x_disp.append(state_data[i])
-            i+=1
+                x_disp.append(state_data[index])
+                index+=1
+        #10104
             
     x_disp=np.reshape(x_disp,(-1,ndf))
     x_disp=np.around(x_disp,decimals=5)
     
-    return x_disp,no_of_states
+    return x_disp,n_states
