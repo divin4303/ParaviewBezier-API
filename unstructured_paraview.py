@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Fri Sep 25 10:11:43 2020
-
-@author: User
-"""
+'''
+Creates the paraview file in folder named 
+'''
+import os
 def uparaview(ndm,nump,nel,nen,w,x,ixbez,global_order,filename,u,nstep=0,timefl=True,ufl=True):
     
+    c_dir = os.getcwd()
+    path = os.path.join(c_dir, r'Paraview')
+    if not os.path.exists(path):
+        os.makedirs(path)
+        
     # set extender name
     parext='.vtu'
     
@@ -15,17 +19,17 @@ def uparaview(ndm,nump,nel,nen,w,x,ixbez,global_order,filename,u,nstep=0,timefl=
     #file naming for mutliple file outputs current time step=nstep
     
     else:
-        if nstep<9:
+        if nstep<=9:
             filename=filename+"_paraview"+"00"+str(nstep)
-        elif nstep<99:
+        elif nstep<=99:
             filename=filename+"_paraview"+"0"+str(nstep)
-        elif nstep<999:
+        elif nstep<=999:
             filename=filename+"_paraview"+str(nstep)
     
     filename=filename+parext
     
     # Open the file with writing permission
-    myfile = open(filename, 'w')
+    myfile = open(path+'\\'+filename, 'w')
     
     # Write a line to the file  1000
     myfile.write('<?xml version="1.0"?>\n')

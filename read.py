@@ -51,9 +51,7 @@ def read_keywordfile(lines):
                 
             elif line.startswith("*") and flag==True:
                 flag=False
-                nnode.append(line_no-1)
-                
-        print(nnode,coord_info)       
+                nnode.append(line_no-1)     
 
         if 'created by LS-PrePost' in lines:
             df = pd.read_fwf('temp.k', widths=widths,header=None)

@@ -98,7 +98,7 @@ def _read_header(bb):
         header["external_numbers_dtype"] = np.int32
 
     if header["filetype"] != 1 and header["filetype"] != 5:
-        raise RuntimeError("Wrong filetype %d != 1 (d3plot) or 5 (d3part) in \
+        print("Wrong filetype %d != 1 (d3plot) or 5 (d3part) in \
                            header" % header["filetype"])
 
         # ndim
@@ -119,7 +119,7 @@ def _read_header(bb):
         header['ndim'] = 3
 
     if header["ndim"] != 3:
-        raise RuntimeError("Invalid header entry ndim: %d" % header["ndim"])
+        print("Invalid header entry ndim: %d" % header["ndim"])
 
         # integration points
     if header["maxint"] >= 0:
@@ -143,7 +143,6 @@ def _read_user_ids(header,geometry_section_size,bb):
         return
 
     position = geometry_section_size
-    print("current position for user ID:",position)
 
     # safety
     original_position = position
@@ -182,6 +181,5 @@ def _read_user_ids(header,geometry_section_size,bb):
 
     # update position
     geometry_section_size = position
-    print("After reading the U-ID data:",position)
     return geometry_section_size
 

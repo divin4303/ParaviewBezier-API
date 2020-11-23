@@ -75,7 +75,7 @@ for i in range(no_of_nodes):
   
 
 for i in range(len(Node_info)): 
-    print('s',Node_info[i],patch_info_end[i])
+    
     while patch_info_end[i]!=Node_info[i]:
         
         Num_patch+=1
@@ -90,7 +90,7 @@ for i in range(len(Node_info)):
         t0.append(time.time())
         
         tnel+=temp_tnel
-        
+
         global_ixbez,global_order,nen=\
         Mesh.Bezier_IX(nen,tnel,ixbez,global_ixbez,global_order,p,q,r)
         
@@ -103,8 +103,6 @@ for i in range(22):
     for j in range(no_of_nodes):
         for k in range(3):
             u[j][k]=node_displacement[j+(no_of_nodes*i)][k]-x[j][k]
-    if i==1:
-        print(j+(no_of_nodes*i),u)
     'just pass the global ixbez since the global ixbez has information about \
     all the nodes'
     
@@ -113,11 +111,7 @@ for i in range(22):
     
     upar.uparaview(ndm,numpbez,tnel,nen,wbez,BezPoints,global_ixbez,\
                    global_order,filename,ubez,i)
-
-
-for i in range(1,len(t0)):
-    print('time: ',t0[i]-t0[i-1])
     
 os.remove('temp.k')
-    
+print('Done :)')    
         

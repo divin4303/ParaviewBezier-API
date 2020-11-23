@@ -95,8 +95,7 @@ def _compute_n_bytes_per_state(header, wordsize):
     elif header["mdlopt"] == 0:
         pass
     else:
-        err_msg = "Unexpected value of mdlop: {}, expected was 0, 1 or 2."
-        raise RuntimeError(err_msg.format(header["mdlopt"]))
+        print("Unexpected value of mdlop expected was 0, 1 or 2.")
 
     n_bytes_per_state = timestep_offset + global_vars_offset + \
                         node_data_offset + solid_offset+ shell_offset + \
@@ -107,6 +106,7 @@ def _compute_n_bytes_per_state(header, wordsize):
 ###############################################################
 def collect_file_infos(path,geometry_section_size: int,size_per_state: int):
     
+    mv=[]
     last_nz=0
     bb = BinaryBuffer([path[0]])
     
@@ -188,7 +188,6 @@ def read_state_data(memory_infos: dict):
             fp.readinto(mview[total_offset:total_offset + length])
 
         total_offset += length
-        n_states += minfo["n_states"]
 
     bb_states = BinaryBuffer()
     bb_states.set_mv(memory_required,mview)
@@ -211,13 +210,13 @@ def read_d3plot(ndf=3,n=5,m=5,l=1):
     
     state_data,n_states=read_state_data(memory_infos)
     numnp=n*m*l
-   
+    
     for i in range(n_states):
         
         index=var_offset #(1+'nlgbv')
         for j in range(numnp):
             for k in range(ndf):
-                x_disp.append(state_data[index])
+                x_disp.append(state_data[i][index])
                 index+=1
         #10104
             

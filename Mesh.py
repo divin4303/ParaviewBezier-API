@@ -113,7 +113,7 @@ def Bezier_IX(nenloc,tnel,ixbezloc,temp_ixbez,temp_order,p,q,r):
                 global_ixbez[i][j]=0
             else:
                 global_ixbez[i][j]=temp_ixbez[i][j] 
-    print('l',row,tnelloc,tnel,nen,c,nenloc)
+                
     for i in range(row,tnel,1):
         for j in range(nen):
            
