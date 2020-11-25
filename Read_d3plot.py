@@ -36,19 +36,20 @@ def find_EOF(position):
 
     return EOF
 		
-def _read_geometry_data(header,geometry_section_size):
+def read_geometry_data(header,geometry_section_size):
     
     position = geometry_section_size
     
     section_word_length = header['ndim'] * header['numnp']
     #calculation of word length for reding node coordinates
- 
     position += section_word_length * word 
     #update the position after reading the node coordinates
-        
     # shells
     section_word_length = 5 * header['nel4']
+    position += section_word_length * word
     
+    #solids 
+    section_word_length = 9 * header['nel8']
     position += section_word_length * word
 
     geometry_section_size = position
@@ -71,7 +72,7 @@ def _read_words( words_to_read: dict, storage_dict: dict = None):
 
     return storage_dict        
 
-def _compute_n_bytes_per_state(header, wordsize):
+def compute_n_bytes_per_state(header, wordsize):
 #81600
     if not header:
         return 0
@@ -82,6 +83,7 @@ def _compute_n_bytes_per_state(header, wordsize):
     # node vars
     n_node_vars = (header["iu"] +header["iv"] +header["ia"]) * header["ndim"]
     node_data_offset = int(n_node_vars) * int(header["numnp"]) * int(wordsize)
+    
         # solids
     solid_offset = header["nel8"] * header["nv3d"] * wordsize
         # shells
@@ -99,7 +101,8 @@ def _compute_n_bytes_per_state(header, wordsize):
 
     n_bytes_per_state = timestep_offset + global_vars_offset + \
                         node_data_offset + solid_offset+ shell_offset + \
-                        elem_deletion_offset
+                        elem_deletion_offset#+therm_data_offset
+                        
     var_offset=1+header["nglbv"]
     
     return n_bytes_per_state,var_offset
@@ -140,7 +143,6 @@ def collect_file_infos(path,geometry_section_size: int,size_per_state: int):
         with open(file,'rb') as f:
         
             last_nonzero_byte_index = -1
-            size_per_state=81600
             file_size=os.path.getsize(file)
             
             n_blocks = file_size // mmap.ALLOCATIONGRANULARITY
@@ -166,7 +168,7 @@ def collect_file_infos(path,geometry_section_size: int,size_per_state: int):
             "filepath": file,
             "n_states": n_states_in_file
             })
-                
+                      
     return memory_infos
 
 def read_state_data(memory_infos: dict):
@@ -196,20 +198,33 @@ def read_state_data(memory_infos: dict):
     state_data = state_data.reshape((n_states, -1))
     
     return state_data,n_states
+#########################################################
+def displacement(tstep,numnp,node_displacement,x):
+    
+    u=[]
+    for i in range(tstep):
+        uloc = [[0 for i in range(3)] for j in range(numnp)]
+        for j in range(numnp):
+            for k in range(3):
+                uloc[j][k]=node_displacement[j+(numnp*i)][k]-x[j][k]
+        
+        u.append(np.pad(uloc,((0, 0), (0, 0))))
+    u = np.stack(u)
+    
+    return u
 #########S###############################################
-def read_d3plot(ndf=3,n=5,m=5,l=1):
+def read_d3plot(ndf,numnp,x):
     x_disp=[]
     
     head,geometry_section_size=Headers._read_header(bb)
-    geometry_section_size=_read_geometry_data(head,geometry_section_size)
+    geometry_section_size=read_geometry_data(head,geometry_section_size)
     geometry_section_size=Headers._read_user_ids(head,geometry_section_size,bb)
-
-    bytes_per_state,var_offset=_compute_n_bytes_per_state(head, word)
+    
+    bytes_per_state,var_offset=compute_n_bytes_per_state(head, word)
     
     memory_infos=collect_file_infos(path,geometry_section_size,bytes_per_state)
     
     state_data,n_states=read_state_data(memory_infos)
-    numnp=n*m*l
     
     for i in range(n_states):
         
@@ -223,4 +238,7 @@ def read_d3plot(ndf=3,n=5,m=5,l=1):
     x_disp=np.reshape(x_disp,(-1,ndf))
     x_disp=np.around(x_disp,decimals=5)
     
-    return x_disp,n_states
+    
+    u=displacement(n_states,numnp,x_disp,x)
+    
+    return u,n_states

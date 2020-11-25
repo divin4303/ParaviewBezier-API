@@ -122,9 +122,7 @@ def uparaview(ndm,nump,nel,nen,w,x,ixbez,global_order,filename,u,nstep=0,timefl=
         myfile.write('\n<DataArray type="%s" Name="%s" NumberOfComponents="%s" format="ascii">'%('Float64','Displacements',3))
         for i in range(0,nump):
             for j in range(0,3):
-                myfile.write('%14.5E'%(u[i][j]))
-            myfile.write('\n')
-
+                myfile.write('\n%14.5E'%(u[i][j]))
             
         myfile.write('\n</DataArray>')                 # Close Displ.
     myfile.write('\n</PointData>')

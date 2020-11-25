@@ -23,12 +23,13 @@ import dis_bezier
 import time
 t0=[]
 
-
 wbez=[]
 numpbez=0
 global_ixbez=[[]]
 global_order=np.zeros((0,3))
+
 tnel=0
+tnumnp=0
 Num_patch=0
 X, Y, Z=([],[],[])
 patch_info_end=[]       
@@ -47,15 +48,12 @@ try:
         temp.close()
 except IOError:
     # 'File not found' error message.
-    print('File not found')  
+    print('File not found')
+
 
 Node_info,df,ndm,coord_info,nnode=read.read_keywordfile(lines)
-node_displacement,tstep=Read_d3plot.read_d3plot()
 
 BezPoints=np.zeros((0,ndm))
-
-vbez=np.zeros((0,ndm))
-abez=np.zeros((0,ndm))
 
 for i in range(len(coord_info)):
     X+=list(df.iloc[coord_info[i]:nnode[i],1].to_numpy(dtype=float))
@@ -65,7 +63,6 @@ for i in range(len(coord_info)):
 
 no_of_nodes=len(X)
 x = [[0 for i in range(3)] for j in range(no_of_nodes)]
-u = [[0 for i in range(3)] for j in range(no_of_nodes)]
 
 for i in range(no_of_nodes):
     
@@ -73,44 +70,46 @@ for i in range(no_of_nodes):
     x[i][1]=Y[i]
     x[i][2]=Z[i]
   
-
+u,tstep=Read_d3plot.read_d3plot(3,no_of_nodes,x)
+uglobal=np.zeros((tstep,0,3))
 for i in range(len(Node_info)): 
     
     while patch_info_end[i]!=Node_info[i]:
         
+        temp_uglobal=[]
         Num_patch+=1
-        n,m,l,p,q,r,knot_r,knot_s,knot_t,conn,wght,Node_info[i],nel,mel,lel=\
+        
+        patch_info,knot_r,knot_s,knot_t,conn,wght,Node_info[i]=\
         File_Info.NodeInfo(df,Node_info[i],ndm,filename)
         
-        t0.append(time.time())
         
         BezPoints,wbez,numpbez,ixbez,nen,temp_tnel=\
-        mesh_bezier.bez_patch(ndm,nel,mel,lel,n,m,l,p,q,r,knot_r,knot_s,\
+        mesh_bezier.bez_patch(ndm,patch_info,knot_r,knot_s,\
                                     knot_t,conn,wght,x,BezPoints,wbez,numpbez)
-        t0.append(time.time())
-        
         tnel+=temp_tnel
-
-        global_ixbez,global_order,nen=\
-        Mesh.Bezier_IX(nen,tnel,ixbez,global_ixbez,global_order,p,q,r)
+        patch_info.update({
+            'Bezier_points':len(BezPoints)})
         
-        t0.append(time.time())
+        print(ixbez)
+        for t in range(tstep):
+            ubez=dis_bezier.state_variable(ndm,patch_info,knot_r,\
+                                   knot_s,knot_t,conn,wght,u[t,:,:],uglobal[t,:,:],wbez,\
+                                       ixbez)
+            temp_uglobal.append(np.pad(ubez,((0, 0), (0, 0))))
+        temp_uglobal = np.stack(temp_uglobal)
+        
+        uglobal=temp_uglobal
+            
+        global_ixbez,global_order,nen=\
+        Mesh.Bezier_IX(ndm,nen,tnel,ixbez,global_ixbez,global_order,patch_info)
+        
+        #print(ixbez,'*********',global_ixbez,patch_info['Bezier_points'])
+        
 
-ubez=np.zeros((len(BezPoints),3))
-for i in range(22):
-    'filtering the '
-    'u=node_displacement - x'
-    for j in range(no_of_nodes):
-        for k in range(3):
-            u[j][k]=node_displacement[j+(no_of_nodes*i)][k]-x[j][k]
-    'just pass the global ixbez since the global ixbez has information about \
-    all the nodes'
-    
-    ubez=dis_bezier.state_variable(ndm,nel,mel,lel,n,m,l,p,q,r,knot_r,knot_s,\
-                                   knot_t,conn,wght,u,ubez,wbez,global_ixbez)
+for i in range(tstep):
     
     upar.uparaview(ndm,numpbez,tnel,nen,wbez,BezPoints,global_ixbez,\
-                   global_order,filename,ubez,i)
+                    global_order,filename,uglobal[i,:,:],i)
     
 os.remove('temp.k')
 print('Done :)')    

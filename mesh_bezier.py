@@ -1,9 +1,7 @@
 """
 ==================================================================
-input : n,m,l               : number of nodal points in r,s,t dir.
-        p,q,r               : order of the fn in r,s,t dir.
+input : patch_info          :dict
         Node_info           : position of the pointer.
-        nel,mel,lel         : number of elements in r,s,t dir
         knot_r,knot_S,knot_t: number of elemtns in r,s,t dir.
         X,Y,z               : coordinates in x,y,z dir.
         BezPoints           : Bezpoints in x,y,z coordinates.
@@ -32,9 +30,20 @@ import unstructured_paraview as upar
 import time
 from memory_profiler import profile
 
-def bez_patch(ndm,nel,mel,lel,n,m,l,p,q,r,knot_r,knot_s,knot_t,conn,w,x,\
+def bez_patch(ndm,patch_info,knot_r,knot_s,knot_t,conn,w,x,\
               BezPoints,wbez,numpbez):
-
+    
+    nel=patch_info['nel']
+    mel=patch_info['mel']
+    
+    p=patch_info['p']
+    q=patch_info['q']
+    if ndm==3:
+        r=patch_info['r']
+        lel=patch_info['lel']
+    else:
+        r=0
+    
     elem_no=0
     ptol=1E-4
     ne=1
@@ -46,7 +55,7 @@ def bez_patch(ndm,nel,mel,lel,n,m,l,p,q,r,knot_r,knot_s,knot_t,conn,w,x,\
     elif ndm==3:
         tnel=nel*mel*lel
         
-    IX,w=Mesh.Connectvity(ndm,conn,w,tnel,nel,mel,lel,n,m,l,p,q,r)
+    IX,w=Mesh.Connectvity(ndm,conn,w,tnel,patch_info)
     
     if ndm==1:
         'Initialization for directional operator'

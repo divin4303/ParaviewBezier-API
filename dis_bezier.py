@@ -4,8 +4,20 @@ import full_Elem_Extraction_Operator
 import BezierCoord
 import Directional_Extract_Op
 
-def state_variable(ndm,nel,mel,lel,n,m,l,p,q,r,knot_r,knot_s,knot_t,conn,\
-                   w,u,ubez,wbez,ixbez):
+def state_variable(ndm,patch_info,knot_r,knot_s,knot_t,conn,\
+                   w,u,temp_ubez,wbez,ixbez):
+    
+    nel=patch_info['nel']
+    mel=patch_info['mel']
+    
+    p=patch_info['p']
+    q=patch_info['q']
+    
+    if ndm==3:
+        r=patch_info['r']
+        lel=patch_info['lel']
+    else:
+        r=0
     
     elem_no=0
     ne=1
@@ -17,7 +29,7 @@ def state_variable(ndm,nel,mel,lel,n,m,l,p,q,r,knot_r,knot_s,knot_t,conn,\
     elif ndm==3:
         tnel=nel*mel*lel
         
-    IX,w=Mesh.Connectvity(ndm,conn,w,tnel,nel,mel,lel,n,m,l,p,q,r)
+    IX,w=Mesh.Connectvity(ndm,conn,w,tnel,patch_info)
     
     if ndm==1:
         'Initialization for directional operator'
@@ -87,6 +99,12 @@ def state_variable(ndm,nel,mel,lel,n,m,l,p,q,r,knot_r,knot_s,knot_t,conn,\
     w_local=np.zeros(nen)
     IXloc=[0 for i in range(nen)]
     
+    ubez=np.zeros((patch_info['Bezier_points'],3))
+    
+    for i in range(len(temp_ubez)):
+        for j in range(0,3,1):
+            ubez[i][j]=temp_ubez[i][j]
+        
     #numpbez=0       
     for ne in range(1,tnel+1):
         
@@ -146,10 +164,19 @@ def state_variable(ndm,nel,mel,lel,n,m,l,p,q,r,knot_r,knot_s,knot_t,conn,\
                                                    ,ne_bez,ndm,p,q,r)
         
         'we need to store this'
+        
         for i in range(0,nen,1):
             for j in range(0,3,1):
-                ubez[ixbez[ne-1][i]-1][j]=ubezloc[i][j]
-    
+                
+                k=ixbez[ne-1][i]
+                
+                if k<len(temp_ubez):
+                    ubez[k-1][j]=temp_ubez[k-1][j]
+                    
+                else:
+                    #print(k-1)
+                    ubez[k-1][j]=ubezloc[i][j]
+                
     return ubez
 
 
