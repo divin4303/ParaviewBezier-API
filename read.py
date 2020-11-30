@@ -19,6 +19,7 @@ def read_keywordfile(lines):
     coord_info=[]
     nnode=[]
     patch_info=[]
+    patch_info_end=[]
     
     
     with open('temp.k','r') as f:
@@ -51,7 +52,10 @@ def read_keywordfile(lines):
                 
             elif line.startswith("*") and flag==True:
                 flag=False
-                nnode.append(line_no-1)     
+                nnode.append(line_no-1)
+            
+            if line.startswith("*END") :
+                patch_info_end.append(line_no-1)
 
         if 'created by LS-PrePost' in lines:
             df = pd.read_fwf('temp.k', widths=widths,header=None)
@@ -64,5 +68,7 @@ def read_keywordfile(lines):
     
 
         f.close()
+        
+        
             
-        return patch_info,df,ndm,coord_info,nnode
+        return patch_info,df,ndm,coord_info,nnode,patch_info_end

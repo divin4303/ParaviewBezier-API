@@ -101,9 +101,7 @@ def state_variable(ndm,patch_info,knot_r,knot_s,knot_t,conn,\
     
     ubez=np.zeros((patch_info['Bezier_points'],3))
     
-    for i in range(len(temp_ubez)):
-        for j in range(0,3,1):
-            ubez[i][j]=temp_ubez[i][j]
+    ubez[0:len(temp_ubez), 0:3] = temp_ubez
         
     #numpbez=0       
     for ne in range(1,tnel+1):
@@ -170,12 +168,15 @@ def state_variable(ndm,patch_info,knot_r,knot_s,knot_t,conn,\
                 
                 k=ixbez[ne-1][i]
                 
-                if k<len(temp_ubez):
-                    ubez[k-1][j]=temp_ubez[k-1][j]
-                    
-                else:
-                    #print(k-1)
+                if k>=len(temp_ubez):
                     ubez[k-1][j]=ubezloc[i][j]
+
+                    
+        
+        '''
+        j2 = sorted(i for i in j if i >= 5)
+        why didn't i use the entire temp displacement
+        '''
                 
     return ubez
 

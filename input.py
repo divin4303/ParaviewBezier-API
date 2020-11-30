@@ -12,6 +12,9 @@ output: vtk file
 import numpy as np
 import os
 import sys
+from multiprocessing import Pool
+import time
+
 import mesh_bezier
 import File_Info
 import Mesh
@@ -20,7 +23,7 @@ import read
 import Read_d3plot
 import dis_bezier
 
-import time
+
 t0=[]
 
 wbez=[]
@@ -31,8 +34,7 @@ global_order=np.zeros((0,3))
 tnel=0
 tnumnp=0
 Num_patch=0
-X, Y, Z=([],[],[])
-patch_info_end=[]       
+X, Y, Z=([],[],[])       
 
 
 filename = sys.argv[1]
@@ -51,7 +53,7 @@ except IOError:
     print('File not found')
 
 
-Node_info,df,ndm,coord_info,nnode=read.read_keywordfile(lines)
+Node_info,df,ndm,coord_info,nnode,patch_info_end=read.read_keywordfile(lines)
 
 BezPoints=np.zeros((0,ndm))
 
@@ -59,7 +61,6 @@ for i in range(len(coord_info)):
     X+=list(df.iloc[coord_info[i]:nnode[i],1].to_numpy(dtype=float))
     Y+=list(df.iloc[coord_info[i]:nnode[i],2].to_numpy(dtype=float))
     Z+=list(df.iloc[coord_info[i]:nnode[i],3].to_numpy(dtype=float))
-    patch_info_end.append(coord_info[i]-1)
 
 no_of_nodes=len(X)
 x = [[0 for i in range(3)] for j in range(no_of_nodes)]
@@ -72,7 +73,10 @@ for i in range(no_of_nodes):
   
 u,tstep=Read_d3plot.read_d3plot(3,no_of_nodes,x)
 uglobal=np.zeros((tstep,0,3))
-for i in range(len(Node_info)): 
+
+for i in range(len(Node_info)):
+    
+    print(Node_info[i],u.shape)
     
     while patch_info_end[i]!=Node_info[i]:
         
@@ -89,8 +93,7 @@ for i in range(len(Node_info)):
         tnel+=temp_tnel
         patch_info.update({
             'Bezier_points':len(BezPoints)})
-        
-        print(ixbez)
+        'try multiprocessing' 
         for t in range(tstep):
             ubez=dis_bezier.state_variable(ndm,patch_info,knot_r,\
                                    knot_s,knot_t,conn,wght,u[t,:,:],uglobal[t,:,:],wbez,\
@@ -102,8 +105,6 @@ for i in range(len(Node_info)):
             
         global_ixbez,global_order,nen=\
         Mesh.Bezier_IX(ndm,nen,tnel,ixbez,global_ixbez,global_order,patch_info)
-        
-        #print(ixbez,'*********',global_ixbez,patch_info['Bezier_points'])
         
 
 for i in range(tstep):

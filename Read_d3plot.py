@@ -13,7 +13,7 @@ for filename in filepath:
         path.append(os.path.basename(filename))
 
 _header = {}
-bb = BinaryBuffer(path)
+bb = BinaryBuffer([path[0]])
 
 #assunming double precision
 char_size = 1
@@ -170,51 +170,69 @@ def collect_file_infos(path,geometry_section_size: int,size_per_state: int):
             })
                       
     return memory_infos
+##########################################################
+def displacement(u,numnp,node_displacement,x,n_states):
 
-def read_state_data(memory_infos: dict):
-    n_states = sum(map(lambda x: x["n_states"], memory_infos))
-
-    memory_required = 0
-    for mem in memory_infos:
-        memory_required += int(mem["length"])
-    mview = memoryview(bytearray(memory_required))
-
-    total_offset = 0
-    for minfo in memory_infos:
-        start = minfo["start"]
-        length = minfo["length"]
-        filepath = minfo["filepath"]
-        
-        with open(filepath, "br") as fp:
-            fp.seek(start)
-            fp.readinto(mview[total_offset:total_offset + length])
-
-        total_offset += length
-
-    bb_states = BinaryBuffer()
-    bb_states.set_mv(memory_required,mview)
-
-    state_data = bb_states.read_ndarray(0, memory_required, 1, np.float64)
-    state_data = state_data.reshape((n_states, -1))
+    uloc = [[0 for i in range(3)] for j in range(numnp)]
     
-    return state_data,n_states
-#########################################################
-def displacement(tstep,numnp,node_displacement,x):
-    
-    u=[]
-    for i in range(tstep):
-        uloc = [[0 for i in range(3)] for j in range(numnp)]
+    for i in range(n_states):
         for j in range(numnp):
             for k in range(3):
                 uloc[j][k]=node_displacement[j+(numnp*i)][k]-x[j][k]
-        
+    
         u.append(np.pad(uloc,((0, 0), (0, 0))))
-    u = np.stack(u)
     
     return u
 #########S###############################################
+def read_state_data(memory_infos: dict,var_offset: int,numnp: int,x,ndf=3):
+    
+    n_states = sum(map(lambda x: x["n_states"], memory_infos))
+    u=[]
+    
+    memory_required = 0
+    offset = 0
+    bb_states = BinaryBuffer()
+    '''
+    load the files one by one
+    and read the array here itself
+    '''
+    for minfo in memory_infos:
+        x_disp=[]
+        start = minfo["start"]
+        length = minfo["length"]
+        filepath = minfo["filepath"]
+        n_states_per_file=int(minfo["n_states"])
+        
+        if n_states_per_file>0:
+            
+            with open(filepath, "br") as fp:
+                fp.seek(start)
+                mview = memoryview(bytearray(length))
+                fp.readinto(mview[offset:offset + length])
+            
+            bb_states.set_mv(length,mview)
+            
+            state_data = bb_states.read_ndarray(0, length, 1, np.float64)
+            state_data = state_data.reshape((n_states_per_file, -1))
+            
+            for i in range(n_states_per_file):
+                index=var_offset #(1+'nlgbv')
+                for j in range(numnp):
+                    for k in range(ndf):
+                        x_disp.append(state_data[i][index])
+                        index+=1
+                
+            
+            x_disp=np.reshape(x_disp,(-1,ndf))
+            x_disp=np.around(x_disp,decimals=5)
+            
+            u=displacement(u,numnp,x_disp,x,n_states_per_file)
+            
+    u = np.stack(u)
+    
+    return u,n_states
+#########################################################
 def read_d3plot(ndf,numnp,x):
-    x_disp=[]
     
     head,geometry_section_size=Headers._read_header(bb)
     geometry_section_size=read_geometry_data(head,geometry_section_size)
@@ -224,21 +242,6 @@ def read_d3plot(ndf,numnp,x):
     
     memory_infos=collect_file_infos(path,geometry_section_size,bytes_per_state)
     
-    state_data,n_states=read_state_data(memory_infos)
-    
-    for i in range(n_states):
-        
-        index=var_offset #(1+'nlgbv')
-        for j in range(numnp):
-            for k in range(ndf):
-                x_disp.append(state_data[i][index])
-                index+=1
-        #10104
+    u,n_states=read_state_data(memory_infos,var_offset,numnp,x,ndf)
             
-    x_disp=np.reshape(x_disp,(-1,ndf))
-    x_disp=np.around(x_disp,decimals=5)
-    
-    
-    u=displacement(n_states,numnp,x_disp,x)
-    
     return u,n_states
