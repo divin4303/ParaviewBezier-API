@@ -12,6 +12,24 @@ for filename in filepath:
     if os.path.basename(filename).startswith('d3plot'):
         path.append(os.path.basename(filename))
 
+'sorting the list of d3plot bubble sort :)'
+number_d3plot=len(path)
+new_path=list(map(int,[s.replace('d3plot','0') for s in path]))
+
+for i in range(number_d3plot-1,-1,-1):
+    for j in range(1,number_d3plot,1):
+        if new_path[j-1]>new_path[j]:
+            
+            temp=new_path[j]
+            temp1=path[j]
+            
+            new_path[j]=new_path[j-1]
+            path[j]=path[j-1]
+            
+            new_path[j-1]=temp
+            path[j-1]=temp1
+
+
 _header = {}
 bb = BinaryBuffer([path[0]])
 
@@ -189,7 +207,6 @@ def read_state_data(memory_infos: dict,var_offset: int,numnp: int,x,ndf=3):
     n_states = sum(map(lambda x: x["n_states"], memory_infos))
     u=[]
     
-    memory_required = 0
     offset = 0
     bb_states = BinaryBuffer()
     '''

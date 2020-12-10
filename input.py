@@ -34,7 +34,7 @@ global_order=np.zeros((0,3))
 tnel=0
 tnumnp=0
 Num_patch=0
-X, Y, Z=([],[],[])       
+X, Y, Z=([],[],[])     
 
 
 filename = sys.argv[1]
@@ -55,13 +55,14 @@ except IOError:
 
 Node_info,df,ndm,coord_info,nnode,patch_info_end=read.read_keywordfile(lines)
 
+print(coord_info,'*******',nnode)
 BezPoints=np.zeros((0,ndm))
 
 for i in range(len(coord_info)):
     X+=list(df.iloc[coord_info[i]:nnode[i],1].to_numpy(dtype=float))
     Y+=list(df.iloc[coord_info[i]:nnode[i],2].to_numpy(dtype=float))
     Z+=list(df.iloc[coord_info[i]:nnode[i],3].to_numpy(dtype=float))
-
+    
 no_of_nodes=len(X)
 x = [[0 for i in range(3)] for j in range(no_of_nodes)]
 
@@ -93,6 +94,7 @@ for i in range(len(Node_info)):
         tnel+=temp_tnel
         patch_info.update({
             'Bezier_points':len(BezPoints)})
+        
         'try multiprocessing' 
         for t in range(tstep):
             ubez=dis_bezier.state_variable(ndm,patch_info,knot_r,\

@@ -33,11 +33,8 @@ def Connectvity(ndm,conn,wghts,tnel,patch_info):
     IX[nel-1][]=conn[0:m*l][(nel-1)*p:nel*p] 
     """
     Elem=0
-    e=2
-    f=1
-    g=2
     'There could be some relation between n-p and nel'
-    # temp1=open("temp1.k", "w")
+    temp1=open("temp1.k", "w")
     
     if ndm==1:
     
@@ -77,28 +74,34 @@ def Connectvity(ndm,conn,wghts,tnel,patch_info):
                 Elem=Elem+1
         
     if ndm==3:
-        
+        e=0
         for k in range(nel):
+            f=0
             for i in range(mel):
+                g=0
                 for j in range(lel):
                     count=0
                 
                     for jloc in range(0,((r+1)*(q+1))):
                         for kloc in range(0,p+1):
                     
-                            npr=(k*e)+kloc
-                            nps=i*f+j*(q+1)+jloc
+                            npr=(e)+kloc
+                            nps=f*(r+1)+g*(q+1)+jloc
                     
                             IX[Elem][count]=conn[nps][npr]
                             w[Elem][count]=wghts[nps][npr]
-                            #temp1.write(' %8d'%(IX[Elem][count]))
+                            temp1.write(' %8d'%(IX[Elem][count]))
                             count+=1
-                    #temp1.write('\n')
+                    temp1.write('\n')
                     Elem=Elem+1
                     
-        # temp1.write('\n')
+                    g+=patch_info['lel mult'][j]
+                f+=patch_info['mel mult'][i]    
+            e+=patch_info['nel mult'][k]
+                    
+        temp1.write('\n')
     #print(nel,lel,mel,tnel)
-    
+    temp1.close()
     return IX,w
 
 def Bezier_IX(ndm,nenloc,tnel,ixbezloc,temp_ixbez,temp_order,patch_info):

@@ -14,6 +14,20 @@ output: n,m,l: number of nodal points in r,s,t dir.
         knot_r,knot_S,knot_t: number of elemtns in r,s,t dir.
 ======================================
 """
+def multipl(XI,p):
+    m=len(XI)-1 
+    'for the array index other for end knot '
+    b=p+1
+    el_mult=[]
+    
+    while b<m:
+        i=b
+        while b<m and XI[b+1]==XI[b]:
+            b=b+1
+        el_mult.append(b-i+1)
+        b=b+1
+    
+    return el_mult
 
 def NodeInfo(df,Node_info,ndm,filename):
     
@@ -131,6 +145,16 @@ def NodeInfo(df,Node_info,ndm,filename):
         "nel": nel,
         "mel": mel,
         "lel": lel,
+        })
+    
+    nel_mult=multipl(knot_r,p)
+    mel_mult=multipl(knot_s,q)
+    lel_mult=multipl(knot_t,r)
+    
+    patch_infos.update({
+        "nel mult": nel_mult,
+        "mel mult": mel_mult,
+        "lel mult": lel_mult,
         })
             
     # reading connectivity information total rows to read

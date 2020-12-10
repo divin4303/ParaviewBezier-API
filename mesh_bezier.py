@@ -28,7 +28,7 @@ import matplotlib.pyplot as plt
 import unstructured_paraview as upar
 
 import time
-from memory_profiler import profile
+'from memory_profiler import profile'
 
 def bez_patch(ndm,patch_info,knot_r,knot_s,knot_t,conn,w,x,\
               BezPoints,wbez,numpbez):
