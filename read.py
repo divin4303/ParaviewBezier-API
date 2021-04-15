@@ -36,6 +36,10 @@ def read_keywordfile(lines):
                     widths=[4,8,4,8,4,8,4,8,4,8,4,8,4,8,4,8]
                 else:
                     print('width to create coordinate table not mentioned')
+            
+            if line.startswith("*") and patch_flag==True:
+                patch_flag=False
+                patch_info_end.append(line_no-1)
                 
             if  line.startswith("*ELEMENT_SOLID_NURBS_PATCH"):
                 
@@ -48,19 +52,14 @@ def read_keywordfile(lines):
                 patch_flag=True
                 patch_info.append(line_no)
                 ndm=2
-            
-            elif line.startswith("*") and patch_flag==True:
-                patch_flag=False
-                patch_info_end.append(line_no-1)
-                
+             
+            if line.startswith("*") and flag==True:
+                flag=False
+                nnode.append(line_no-1)
             
             if line.startswith("*NODE") or line.startswith("*Node") :
                 flag=True
                 coord_info.append(line_no)
-                
-            elif line.startswith("*") and flag==True:
-                flag=False
-                nnode.append(line_no-1)
 
         if 'created by LS-PrePost' in lines:
             df = pd.read_fwf('temp.k', widths=widths,header=None)

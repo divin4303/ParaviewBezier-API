@@ -24,15 +24,15 @@ import full_Elem_Extraction_Operator
 import BezierCoord
 import Directional_Extract_Op
 import uniqueBez
-import matplotlib.pyplot as plt
-import unstructured_paraview as upar
 
 import time
 'from memory_profiler import profile'
 
-def bez_patch(ndm,patch_info,knot_r,knot_s,knot_t,conn,w,x,\
-              BezPoints,wbez,numpbez):
+def bez_patch(ndm,patch_info,knot_r,knot_s,knot_t,conn,w,x,numpbez):
     
+    patch_numpbez=[numpbez,numpbez]
+    BezPoints=np.zeros((0,ndm))
+    wbez=[]
     nel=patch_info['nel']
     mel=patch_info['mel']
     
@@ -188,11 +188,11 @@ def bez_patch(ndm,patch_info,knot_r,knot_s,knot_t,conn,w,x,\
                                                   ne_bez,ndm,p,q,r)
         
         t1=time.time()
-        BezPoints,wbez,numpbez,ixbez=uniqueBez.Unique(BezPoints,wbez,bezloc\
+        BezPoints,wbez,patch_numpbez,ixbez=uniqueBez.Unique(BezPoints,wbez,bezloc\
                                             ,wbezloc,ixbez,nen,ptol,ndm,nd_bez\
-                                            ,ne_bez,numpbez,p,q,r)
+                                            ,ne_bez,patch_numpbez,p,q,r)
         t2=time.time()
     
-    return BezPoints,wbez,numpbez,ixbez,nen,tnel
+    return BezPoints,wbez,patch_numpbez[1],ixbez,nen,tnel
 
 

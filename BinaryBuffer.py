@@ -38,7 +38,6 @@ class BinaryBuffer:
 
         sizes = [os.path.getsize(path) for path in filepath]
         self.memorysize = sum(sizes)
-        print(self.memorysize)
         # allocate memory
         buffer = memoryview(bytearray(b'0'*self.memorysize))
 

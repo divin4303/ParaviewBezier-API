@@ -22,7 +22,7 @@ Output: xbez                :global Bezier coordinates(updated).
 """
 import numpy as np
 
-def Unique(xbez,wbez,bezloc,wb,ixbez,nen,ptol,ndm,nd_bez,ne_bez,numpbez,p,q,r):
+def Unique(xbez,wbez,bezloc,wb,ixbez,nen,ptol,ndm,nd_bez,ne_bez,patch_numpbez,p,q,r):
       
     xb3= 0
     save=0
@@ -31,45 +31,24 @@ def Unique(xbez,wbez,bezloc,wb,ixbez,nen,ptol,ndm,nd_bez,ne_bez,numpbez,p,q,r):
     for j in range (0,nen): ##for parsing through each point
     
         pflag=True
-        
-        # for k in range(0,len(xbez)):
-        #     ##each point is checked against all the other points and the unique values are stored in an array
-        #     if ndm==3:
-        #         xb3=abs(xbez[k,2]-bezloc[j,2])
-        #         xb2=abs(xbez[k,1]-bezloc[j,1])
-                
-        #     if ndm==2:
-        #         xb2=abs(xbez[k,1]-bezloc[j,1])
-                
-        #     xb1=abs(xbez[k,0]-bezloc[j,0])
-        #     dist=max(xb1,xb2,xb3)
         bol=np.all(np.isclose(bezloc[j,:], xbez, atol=ptol),axis=1)
 
         if True in bol: #store the point in an array
-            save=np.where(bol)[0][0]
+            save=patch_numpbez[0]+np.where(bol)[0][0]
             pflag=False
-            # if numpbez==41:
-                #print(dist,d)
+            
         if pflag==True:
             
-            numpbez = numpbez + 1
-            
-            
-            # if (nd_bez<numpbez):
-                
-            #     print('Number of computed Bezier points too large')
-                
-            # for i in range(0,ndm):
-            #     xbez[numpbez-1,i]=bezloc[j,i]
+            patch_numpbez[1] = patch_numpbez[1] + 1
             xbez=np.row_stack((xbez,bezloc[j,:]))
                 
             wbez.append(wb[j])
             
             #print(j)
-            ixbez[ne_bez-1][j]   = numpbez
+            ixbez[ne_bez-1][j]   = patch_numpbez[1]
  
         else:
             
           ixbez[ne_bez-1][j]   = save+1
       
-    return xbez,wbez,numpbez,ixbez
+    return xbez,wbez,patch_numpbez,ixbez

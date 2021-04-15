@@ -1,37 +1,8 @@
 import os
-import glob
 import numpy as np
 from BinaryBuffer import*
 import Headers
 import mmap
-
-path=[]
-
-filepath = glob.glob(os.getcwd() + "/*")
-for filename in filepath:
-    if os.path.basename(filename).startswith('d3plot'):
-        path.append(os.path.basename(filename))
-
-'sorting the list of d3plot bubble sort :)'
-number_d3plot=len(path)
-new_path=list(map(int,[s.replace('d3plot','0') for s in path]))
-
-for i in range(number_d3plot-1,-1,-1):
-    for j in range(1,number_d3plot,1):
-        if new_path[j-1]>new_path[j]:
-            
-            temp=new_path[j]
-            temp1=path[j]
-            
-            new_path[j]=new_path[j-1]
-            path[j]=path[j-1]
-            
-            new_path[j-1]=temp
-            path[j-1]=temp1
-
-
-_header = {}
-bb = BinaryBuffer([path[0]])
 
 #assunming double precision
 char_size = 1
@@ -249,7 +220,30 @@ def read_state_data(memory_infos: dict,var_offset: int,numnp: int,x,ndf=3):
     
     return u,n_states
 #########################################################
-def read_d3plot(ndf,numnp,x):
+def read_d3plot(path,ndf,numnp,x):
+    
+    new_path=[]     
+    'sorting the list of d3plot bubble sort'
+    number_d3plot=len(path)
+    for file in path:
+        new_path.append(os.path.basename(file))
+        
+    new_path=list(map(int,[s.replace('d3plot','0') for s in new_path]))
+    
+    for i in range(number_d3plot-1,-1,-1):
+        for j in range(1,number_d3plot,1):
+            if new_path[j-1]>new_path[j]:
+                
+                temp    =   new_path[j]
+                temp1   =   path[j]
+                
+                new_path[j]     =   new_path[j-1]
+                path[j]         =   path[j-1]
+
+                new_path[j-1]   =   temp
+                path[j-1]       =   temp1
+    
+    bb = BinaryBuffer([path[0]])
     
     head,geometry_section_size=Headers._read_header(bb)
     geometry_section_size=read_geometry_data(head,geometry_section_size)
@@ -260,5 +254,5 @@ def read_d3plot(ndf,numnp,x):
     memory_infos=collect_file_infos(path,geometry_section_size,bytes_per_state)
     
     u,n_states=read_state_data(memory_infos,var_offset,numnp,x,ndf)
-            
+        
     return u,n_states

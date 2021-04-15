@@ -5,7 +5,7 @@ import BezierCoord
 import Directional_Extract_Op
 
 def state_variable(ndm,patch_info,knot_r,knot_s,knot_t,conn,\
-                   w,u,temp_ubez,wbez,ixbez):
+                   w,u,wbez,ixbez):
     
     nel=patch_info['nel']
     mel=patch_info['mel']
@@ -101,7 +101,7 @@ def state_variable(ndm,patch_info,knot_r,knot_s,knot_t,conn,\
     
     ubez=np.zeros((patch_info['Bezier_points'],3))
     
-    ubez[0:len(temp_ubez), 0:3] = temp_ubez
+    # ubez[0:len(temp_ubez), 0:3] = temp_ubez
         
     #numpbez=0       
     for ne in range(1,tnel+1):
@@ -166,10 +166,10 @@ def state_variable(ndm,patch_info,knot_r,knot_s,knot_t,conn,\
         for i in range(0,nen,1):
             for j in range(0,3,1):
                 
-                k=ixbez[ne-1][i]
+                k=ixbez[ne-1][i]-patch_info['numpbez']
                 
-                if k>=len(temp_ubez):
-                    ubez[k-1][j]=ubezloc[i][j]
+                # if k>=len(temp_ubez):
+                ubez[k-1][j]=ubezloc[i][j]
 
                     
         

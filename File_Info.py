@@ -29,7 +29,7 @@ def multipl(XI,p):
     
     return el_mult
 
-def NodeInfo(df,Node_info,ndm,filename):
+def NodeInfo(df,Node_info,ndm):
     
     knot_r=[]
     knot_s=[]
@@ -78,12 +78,12 @@ def NodeInfo(df,Node_info,ndm,filename):
              "r": r,
         })
     
-    position=position+1 #for wfl
+    position=   position+1 #for wfl
     
-    wfl = int(df.iloc[position,0])
+    wfl     =   int(df.iloc[position,0])
           
-    position=position+1 #knot vector information start line
-    i=0
+    position=   position+1 #knot vector information start line
+    i       =   0
 
     # print(rk)  
     
