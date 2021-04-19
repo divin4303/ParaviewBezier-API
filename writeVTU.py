@@ -28,6 +28,7 @@ class writeVTU:
         self.w      =w              #Bezier weights
         self.order  =global_order   #order of each patch
         self.comp   =Input["compFlag"]
+        self.path   =Input["destination file path"]
     
     def Set(self,filename,timefl=False,ufl=False,u=np.zeros((1,1,3))):
         
@@ -58,8 +59,8 @@ class writeVTU:
         
         u=self.u[nstep,:,:] #comment this and add the u as input parameter
         
-        c_dir = os.getcwd()
-        path = os.path.join(c_dir, r'Paraview')
+        # c_dir = os.getcwd()
+        path = os.path.join(self.path, r'Paraview')
         if not os.path.exists(path):
             os.makedirs(path)
             
@@ -167,12 +168,18 @@ class writeVTU:
         tp.GetClientSideObject().SetOutput(uGrid)
         
         'write ascii data============================================='
-        writer = XMLUnstructuredGridWriter(Input=tp)
+        if self.comp=="True":
+            
+            writer = XMLUnstructuredGridWriter(Input=tp,CompressorType=3,CompressionLevel=9)
+            writer.DataMode="Binary"
+        else:
+            writer = XMLUnstructuredGridWriter(Input=tp)
+            writer.DataMode="Ascii"
+            
         writer.FileName=path+'\\'+filename
-        writer.DataMode="Ascii"
         writer.UpdatePipeline()
         
-        self.compress(path+'\\'+filename)
+        # self.compress(path+'\\'+filename)
     
 def paraview_module():
     return par

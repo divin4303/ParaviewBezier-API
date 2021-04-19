@@ -18,6 +18,7 @@ class InterFace:
         self.root=Tk()
         self.filepath="None"
         self.filename="None"
+        self.destpath="None"
         self.e1   = Entry(self.root,width=35,borderwidth=5)
         self.e2   = Entry(self.root,width=35,borderwidth=5,show=self.filename)
         self.r    = StringVar()
@@ -36,7 +37,7 @@ class InterFace:
     def button_click(self):
         
         self.filepath, self.filename = ntpath.split(self.e1.get())
-        
+        self.destpath                = self.e2.get()
         # self.filename=self.e2.get()
         # self.filepath=self.e1.get()
         self.dispFlag=self.r.get()
@@ -44,24 +45,31 @@ class InterFace:
         self.parFlag=self.p.get()
         self.compFlag=self.c.get()
         
-    def file_opener(self):
+    def file_opener1(self):
         
         
         filename = filedialog.askopenfilename(initialdir=os.getcwd())
         self.e1.insert(END, filename)
+
+    def file_opener2(self):
         
+        
+        filepath = filedialog.askdirectory(initialdir=os.getcwd())
+        self.e2.insert(0, filepath)        
         
     def interface(self):
         
         mylabel1=Label(self.root,text="File Location:")
-        # mylabel2=Label(self.root,text="File name:")
+        mylabel2=Label(self.root,text="Destination  :")
         
         mylabel1.grid(row=0,column=0,columnspan=1,padx=10,pady=10)
-        # mylabel2.grid(row=1,column=0,columnspan=1,padx=10,pady=10)
+        mylabel2.grid(row=1,column=0,columnspan=1,padx=10,pady=10)
         
-        button_browse=Button(self.root, text ='Browse', command = self.file_opener)
+        button_browse1=Button(self.root, text ='Browse', command = self.file_opener1)
+        button_browse2=Button(self.root, text ='Browse', command = self.file_opener2)
         
-        button_browse.grid(row=0,column=4,columnspan=1,padx=10,pady=10)
+        button_browse1.grid(row=0,column=4,columnspan=1,padx=10,pady=10)
+        button_browse2.grid(row=1,column=4,columnspan=1,padx=10,pady=10)
         
         opt1=Checkbutton(self.root,text="Displacement",variable=self.r,\
                          onvalue="True",offvalue="False")
@@ -74,7 +82,7 @@ class InterFace:
         button_quit=Button(self.root,text="Submit",command=self.root.destroy)
         
         self.e1.grid(row=0,column=1,columnspan=3,padx=10,pady=10)
-        # self.e2.grid(row=1,column=1,columnspan=3,padx=10,pady=10)  
+        self.e2.grid(row=1,column=1,columnspan=3,padx=10,pady=10)  
         
         opt1.deselect()
         opt2.deselect()
@@ -99,6 +107,7 @@ class InterFace:
         Input={
             "filename"               :self.filename,
             "filepath"               :self.filepath,
+            "destination file path"  :self.destpath,
             "dispFlag"               :self.dispFlag,
             "strFlag"                :self.strFlag,
             "Parallel processing"    :self.parFlag,
