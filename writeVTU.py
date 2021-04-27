@@ -145,11 +145,16 @@ class writeVTU:
         
         for i in range(self.nump):            
             rationalWeight.SetValue(i,self.w[i])
+        'Element Tyape ==============================================='
+        if self.ndm==2:
+            elementType=vtk.VTK_BEZIER_QUADRILATERAL
+        elif self.ndm==3:
+            elementType=vtk.VTK_BEZIER_HEXAHEDRON
         'SETTING INPUT FOR WRITER====================================='
         uGrid =vtk.vtkUnstructuredGrid()
         uGrid.GetCellData().SetHigherOrderDegrees(degrees)
         uGrid.SetPoints(points) # sets the points
-        uGrid.SetCells(vtk.VTK_BEZIER_QUADRILATERAL, cells) #sets connectivity buffer and cell type
+        uGrid.SetCells(elementType, cells) #sets connectivity buffer and cell type
         uGrid.GetPointData().SetRationalWeights(rationalWeight)
         if self.ufl:
             # Displacement=====================================================
