@@ -134,12 +134,9 @@ def _init_(bezloc,ne_bez,ndm,nen,p,q,r):
             pc = pc + 1
             conn[pc] = (p+1)*(q+1)*i+(p+1)
         
-         
-        # edge 11
         for i in range(1, r):
             pc = pc + 1
             conn[pc] = (p+1)*(q+1)*i+(p+1)*(q+1)
-        
         # edge 12
         for i in range(1, r):
             pc = pc + 1

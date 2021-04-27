@@ -109,30 +109,34 @@ class writeVTU:
         points.SetData(vnp.numpy_to_vtk(x))
         'CELL CONNECTIVITY============================================'
         ix_temp=np.array(self.ix, dtype=np.int64)
-        temp=[]
-        '''
-        format for cell connectivity is number of nodes/control points in an
-        element followed by the node ids
-        this then could handle multipatch problems
-        '''
-        for i in range(ix_temp.shape[0]):
-            count=0
-            for j in range(ix_temp.shape[1]):
+        # for i in range(ix_temp.shape[0]):
+        #     for j in range(ix_temp.shape[1]):
+        #         if ix_temp[i][j]>0:
+        #             ix_temp[i][j]=ix_temp[i][j]-1
+        # temp=[]
+        # '''
+        # format for cell connectivity is number of nodes/control points in an
+        # element followed by the node ids
+        # this then could handle multipatch problems
+        # '''
+        # for i in range(ix_temp.shape[0]):
+        #     count=0
+        #     for j in range(ix_temp.shape[1]):
                 
-                if ix_temp[i][j]>0:
-                    count+=1
-            temp.append(count)
+        #         if ix_temp[i][j]>0:
+        #             count+=1
+        #     temp.append(count)
             
-        ix=np.zeros((ix_temp.shape[0],ix_temp.shape[1]+1),dtype=np.int64)
+        # ix=np.zeros((ix_temp.shape[0],ix_temp.shape[1]+1),dtype=np.int64)
         
-        for i in range(len(temp)):
-            ix[i][0]=temp[i]
-        for i in range(ix_temp.shape[0]):
-            for j in range(ix_temp.shape[1]):        
-                ix[i][j+1]=ix_temp[i][j]-1
+        # for i in range(len(temp)):
+        #     ix[i][0]=temp[i]
+        # for i in range(ix_temp.shape[0]):
+        #     for j in range(ix_temp.shape[1]):        
+        #         ix[i][j+1]=ix_temp[i][j]-1
         
-        cells = vtk.vtkCellArray()
-        cells.SetCells(ix_temp.shape[0], vnp.numpy_to_vtkIdTypeArray(ix))
+        # cells = vtk.vtkCellArray()
+        # cells.SetCells(ix_temp.shape[0], vnp.numpy_to_vtkIdTypeArray(ix))
     # ======================================================================
         '''
         format for adding rational weights:
@@ -152,9 +156,16 @@ class writeVTU:
             elementType=vtk.VTK_BEZIER_HEXAHEDRON
         'SETTING INPUT FOR WRITER====================================='
         uGrid =vtk.vtkUnstructuredGrid()
-        uGrid.GetCellData().SetHigherOrderDegrees(degrees)
         uGrid.SetPoints(points) # sets the points
-        uGrid.SetCells(elementType, cells) #sets connectivity buffer and cell type
+        # uGrid.SetCells(elementType, cells) #sets connectivity buffer and cell type
+        for i in range(ix_temp.shape[0]):
+            temp=[]
+            for j in range(ix_temp.shape[1]):
+                if ix_temp[i][j]>0:
+                    temp.append(ix_temp[i][j]-1)
+            print(len(temp))
+            uGrid.InsertNextCell(elementType,len(temp),temp)
+        uGrid.GetCellData().SetHigherOrderDegrees(degrees)
         uGrid.GetPointData().SetRationalWeights(rationalWeight)
         if self.ufl:
             # Displacement=====================================================
