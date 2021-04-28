@@ -163,7 +163,6 @@ class writeVTU:
             for j in range(ix_temp.shape[1]):
                 if ix_temp[i][j]>0:
                     temp.append(ix_temp[i][j]-1)
-            print(len(temp))
             uGrid.InsertNextCell(elementType,len(temp),temp)
         uGrid.GetCellData().SetHigherOrderDegrees(degrees)
         uGrid.GetPointData().SetRationalWeights(rationalWeight)

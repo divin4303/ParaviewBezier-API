@@ -18,9 +18,9 @@ class InterFace:
         self.root=Tk()
         self.filepath="None"
         self.filename="None"
-        self.destpath="None"
+        self.destpath=os.getcwd()
         self.e1   = Entry(self.root,width=35,borderwidth=5)
-        self.e2   = Entry(self.root,width=35,borderwidth=5,show=self.filename)
+        self.e2   = Entry(self.root,width=35,borderwidth=5)
         self.r    = StringVar()
         self.s    = StringVar()
         self.p    = StringVar()
