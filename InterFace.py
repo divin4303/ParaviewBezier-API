@@ -7,15 +7,22 @@ Created on Tue Jan 12 18:45:40 2021
 
 from tkinter import *
 from tkinter import filedialog
-import ntpath
 from writeVTU import *
+import Main
+import tkinter as tk
+from tkinter import ttk
+
+import ntpath
 import os
+import sys
+import glob
+
 
 class InterFace:
     
-    def __init__(self):
+    def __init__(self,root):
         
-        self.root=Tk()
+        self.root=root
         self.filepath="None"
         self.filename="None"
         self.destpath=os.getcwd()
@@ -33,29 +40,99 @@ class InterFace:
         self.strFlag =False
         self.parFlag =False
         self.compFlag=False
+        self.interface()        
+    # def button_click(self):
         
-    def button_click(self):
+    #     self.filepath, self.filename = ntpath.split(self.e1.get())
+    #     self.destpath                = self.e2.get()
+    #     # self.filename=self.e2.get()
+    #     # self.filepath=self.e1.get()
+    #     self.dispFlag=self.r.get()
+    #     self.strFlag=self.s.get()
+    #     self.parFlag=self.p.get()
+    #     self.compFlag=self.c.get()
         
-        self.filepath, self.filename = ntpath.split(self.e1.get())
-        self.destpath                = self.e2.get()
-        # self.filename=self.e2.get()
-        # self.filepath=self.e1.get()
-        self.dispFlag=self.r.get()
-        self.strFlag=self.s.get()
-        self.parFlag=self.p.get()
-        self.compFlag=self.c.get()
-        
+    #     self.Input={
+    #         "filename"               :self.filename,
+    #         "filepath"               :self.filepath,
+    #         "destination file path"  :self.destpath,
+    #         "dispFlag"               :self.dispFlag,
+    #         "strFlag"                :self.strFlag,
+    #         "Parallel processing"    :self.parFlag,
+    #         "compFlag"               :self.compFlag
+    #         }
+    
     def file_opener1(self):
         
-        
+        self.e1.delete(0, 'end')
         filename = filedialog.askopenfilename(initialdir=os.getcwd())
         self.e1.insert(END, filename)
 
     def file_opener2(self):
         
-        
+        self.e2.delete(0, 'end')
         filepath = filedialog.askdirectory(initialdir=os.getcwd())
-        self.e2.insert(0, filepath)        
+        self.e2.insert(0, filepath)
+    
+    def submit_click(self):
+        
+        self.filepath, self.filename = ntpath.split(self.e1.get())
+        self.destpath                = self.e2.get()
+        self.dispFlag=self.r.get()
+        self.strFlag=self.s.get()
+        self.parFlag=self.p.get()
+        self.compFlag=self.c.get()
+        
+        self.Input={
+            "filename"               :self.filename,
+            "filepath"               :self.filepath,
+            "destination file path"  :self.destpath,
+            "dispFlag"               :self.dispFlag,
+            "strFlag"                :self.strFlag,
+            "Parallel processing"    :self.parFlag,
+            "compFlag"               :self.compFlag
+            }
+        path            =   []
+        filepath        =   glob.glob(self.Input["filepath"] + "/*")
+        
+        for file in filepath:
+            if os.path.basename(file).startswith('d3plot'):
+                path.append(file)
+                
+        try:
+            with open(self.Input["filepath"]+'/'+self.Input["filename"],'r') as f:
+                lines   =   f.readline()
+                temp    =   open("temp.k", "w")       
+                for line in f:
+                    
+                    if not line.startswith('$#'):
+                        temp.write(line)
+                
+                temp.close()
+            
+            self.textFrame()
+            Main.main(path,self.Input,self.root,self.e1,self.progress,lines)
+             
+        except IOError:
+            # 'File not found' error message.
+            print(f'{self.Input["filename"]} keyword file not found')
+        
+        
+    def textFrame(self):
+        
+        self.progress= ttk.Progressbar(self.root,orient=HORIZONTAL,length=290,mode='determinate')
+        label1       = tk.Label(self.root,text="Progress:")
+        chat_space   = tk.Frame(self.root, bg="blue")
+        self.e1      = tk.Text(chat_space,width=65,height=10,borderwidth=2)
+    
+        self.progress.grid(row=7,column=1,padx=10,pady=10)
+        label1.grid(row=7,column=0,columnspan=1,padx=10,pady=10)
+        chat_space.grid(row=8,column=0,columnspan=5,padx=0,sticky=NSEW)
+        self.e1.pack(fill="both", expand=True)
+        self.e1.tag_configure('big2', font=('Arial', 8,'bold'))
+        self.e1.tag_configure('big', font=('Verdana', 10, 'bold'))
+        self.root.grid_columnconfigure(0, uniform="uniform", weight=1)
+        self.root.grid_rowconfigure(8, weight=1)
         
     def interface(self):
         
@@ -78,8 +155,8 @@ class InterFace:
         opt3=Checkbutton(self.root,text="Parallel Processing",variable=self.p,\
                          onvalue="True",offvalue="False")
         
-        button_accept=Button(self.root,text="Accept",command=self.button_click)
-        button_quit=Button(self.root,text="Submit",command=self.root.destroy)
+        button_quit=Button(self.root,text="Quit",command=self.root.destroy)
+        button_accept=Button(self.root,text="Submit",command=self.submit_click)
         
         self.e1.grid(row=0,column=1,columnspan=3,padx=10,pady=10)
         self.e2.grid(row=1,column=1,columnspan=3,padx=10,pady=10)  
@@ -99,27 +176,17 @@ class InterFace:
             opt4.deselect()
             opt4.grid(row=5,column=0,columnspan=2,sticky="W")
     
-        button_quit.grid(row=6,column=2,padx=10,pady=10)
-        button_accept.grid(row=6,column=1,padx=10,pady=10)
+        button_accept.grid(row=5,column=3,padx=10,pady=10)
+        button_quit.grid(row=5,column=4,padx=10,pady=10)
         
         self.root.mainloop()
-        
-        Input={
-            "filename"               :self.filename,
-            "filepath"               :self.filepath,
-            "destination file path"  :self.destpath,
-            "dispFlag"               :self.dispFlag,
-            "strFlag"                :self.strFlag,
-            "Parallel processing"    :self.parFlag,
-            "compFlag"               :self.compFlag
-            }
-        
-        return Input
     
-    def display(self,patch_ID):
-        
-        status=Label(self.root,text="processing patch:"+str(patch_ID),bd=1,\
-                     relief=SUNKEN,anchor=W)
-        status.grid(row=1,column=1,columnspan=3,sticky=W+E)
-        self.root.mainloop()
-        return
+if __name__=='__main__':
+    
+    root=Tk()
+    inter           =   InterFace(root)
+    try:
+        os.remove('temp.k')
+    except:
+        print('no temp file created')
+    root.mainloop()
