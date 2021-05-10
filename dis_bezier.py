@@ -5,8 +5,8 @@ import BezierCoord
 import Directional_Extract_Op
 
 def state_variable(ndm,patch_info,knot_r,knot_s,knot_t,conn,\
-                   w,u,wbez,ixbez):
-    
+                   w,temp_tnel,u,ixbez):
+
     nel=patch_info['nel']
     mel=patch_info['mel']
     
@@ -29,6 +29,7 @@ def state_variable(ndm,patch_info,knot_r,knot_s,knot_t,conn,\
     elif ndm==3:
         tnel=nel*mel*lel
         
+    temp_tnel-=tnel
     IX,w=Mesh.Connectvity(ndm,conn,w,tnel,patch_info)
     
     if ndm==1:
@@ -104,16 +105,16 @@ def state_variable(ndm,patch_info,knot_r,knot_s,knot_t,conn,\
     # ubez[0:len(temp_ubez), 0:3] = temp_ubez
         
     #numpbez=0       
-    for ne in range(1,tnel+1):
+    for ne in range(0,tnel):
         
-        ne_bez = ne
-        i=C_num[ne-1][1]
-        j=C_num[ne-1][2]
+        ne_bez = ne+1
+        i=C_num[ne][1]
+        j=C_num[ne][2]
                 
         for k in range(0,nen):
             
-            IXloc[k]=IX[ne-1][k]
-            w_local[k]=w[ne-1][k]
+            IXloc[k]=IX[ne][k]
+            w_local[k]=w[ne][k]
             'IEN should be with nel: required as it is single patch information' 
         #print(IENloc)
         for mi in range(0,nen):# nen = number of element nodes
@@ -131,7 +132,7 @@ def state_variable(ndm,patch_info,knot_r,knot_s,knot_t,conn,\
       
         if ndm==1:
         
-            i=C_num[ne-1]
+            i=C_num[ne]
             
             C=full_Elem_Extraction_Operator.ful_Ce(ndm,C_e1[i,:,:],0,0,p)
             
@@ -140,8 +141,8 @@ def state_variable(ndm,patch_info,knot_r,knot_s,knot_t,conn,\
             
         if ndm==2:
         
-            i=C_num[ne-1][1]
-            j=C_num[ne-1][2]
+            i=C_num[ne][1]
+            j=C_num[ne][2]
             
             C=full_Elem_Extraction_Operator.ful_Ce(ndm,C_e1[i,:,:],C_e2[j,:,:]\
                                                    ,0,p,q)
@@ -151,9 +152,9 @@ def state_variable(ndm,patch_info,knot_r,knot_s,knot_t,conn,\
             
         if ndm==3:
         
-            i=C_num[ne-1][1]
-            j=C_num[ne-1][2]
-            k=C_num[ne-1][3]
+            i=C_num[ne][1]
+            j=C_num[ne][2]
+            k=C_num[ne][3]
             
             C=full_Elem_Extraction_Operator.ful_Ce(ndm,C_e1[i,:,:],C_e2[j,:,:]\
                                                    ,C_e3[k,:,:],p,q,r)
@@ -166,7 +167,7 @@ def state_variable(ndm,patch_info,knot_r,knot_s,knot_t,conn,\
         for i in range(0,nen,1):
             for j in range(0,3,1):
                 
-                k=ixbez[ne-1][i]-patch_info['numpbez']
+                k=ixbez[temp_tnel+ne][i]-patch_info['numpbez']
                 
                 # if k>=len(temp_ubez):
                 ubez[k-1][j]=ubezloc[i][j]

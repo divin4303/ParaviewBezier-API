@@ -21,7 +21,7 @@ def read_keywordfile(lines):
     nnode=[]
     patch_info=[]
     patch_info_end=[]
-    
+    ndm=[]
     
     with open('temp.k','r') as f:
             #print(lines)
@@ -45,13 +45,13 @@ def read_keywordfile(lines):
                 
                 patch_flag=True
                 patch_info.append(line_no)
-                ndm=3
+                ndm.append(3)
                 
             elif line.startswith("*ELEMENT_SHELL_NURBS_PATCH"):
                 
                 patch_flag=True
                 patch_info.append(line_no)
-                ndm=2
+                ndm.append(2)
              
             if line.startswith("*") and flag==True:
                 flag=False
@@ -73,6 +73,11 @@ def read_keywordfile(lines):
 
         f.close()
         
-        
+        fileInfo={
+            'Coordinate start' : coord_info,
+            'Coordinate end'   : nnode,
+            'patch start'      : patch_info,
+            'patch end'        : patch_info_end,
+            'dimensions'       : ndm} 
             
-        return patch_info,df,ndm,coord_info,nnode,patch_info_end
+        return df,fileInfo
