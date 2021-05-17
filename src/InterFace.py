@@ -11,6 +11,12 @@ from Main import *
 import tkinter as tk
 from tkinter import ttk
 
+try:
+    from paraview.simple import *
+except ImportError:
+    print('Could not find Paraview module so the compression \
+          feature will not be enabled')
+
 import ntpath
 import os
 import sys
@@ -34,7 +40,7 @@ class InterFace:
         self.a    = StringVar()
         
         self.root.title("ParaViewBezier")
-        self.root.iconbitmap("..\Image\geo.ico")
+        self.root.iconbitmap(f"{os.getcwd()}\Image\geo.ico")
         
         self.dispFlag  =False
         self.strFlag   =False
@@ -102,9 +108,9 @@ class InterFace:
             self.e3     = Entry(self.root,width=35,borderwidth=5)
             
             self.e3.insert(0, 0)
-            label3.grid(row=8,column=3,columnspan=1,padx=50,pady=10)
-            label2.grid(row=8,column=0,columnspan=1,padx=10,pady=10)
-            self.e3.grid(row=8,column=1,columnspan=1,padx=10,pady=10)
+            label3.grid(row=7,column=3,columnspan=1,padx=50,pady=10)
+            label2.grid(row=7,column=0,columnspan=1,padx=10,pady=10)
+            self.e3.grid(row=7,column=1,columnspan=1,padx=10,pady=10)
                 
         except IOError:
             # 'File not found' error message.
@@ -121,6 +127,12 @@ class InterFace:
                 self.e1.insert(tk.END,'Time step not selected\n')
   
         self.main.getBezierPoints(Input_t)
+    
+    def open_Geomtery(self):
+        
+        vtu_read = self.main.rendObj
+        Show(vtu_read)
+        Interact()
         
         
     def textFrame(self):
@@ -131,11 +143,13 @@ class InterFace:
         chat_space   = tk.Frame(self.root, bg="blue")
         self.text    = tk.Text(chat_space,width=65,height=10,borderwidth=2)
         submitButton =Button(self.root, text ='submit', command = self.Submitbutton)
+        openGeomtery =Button(self.root, text ='Open Geometry', command = self.open_Geomtery)
         
         
-        self.progress.grid(row=7,column=1,padx=10,pady=10)
-        label1.grid(row=7,column=0,columnspan=1,padx=10,pady=10)
-        submitButton.grid(row=8,column=4,columnspan=1,padx=10,pady=10)
+        self.progress.grid(row=8,column=1,padx=10,pady=10)
+        label1.grid(row=8,column=0,columnspan=1,padx=10,pady=10)
+        openGeomtery.grid(row=8,column=3,columnspan=1,padx=10,pady=10)
+        submitButton.grid(row=7,column=4,columnspan=1,padx=10,pady=10)
         chat_space.grid(row=9,column=0,columnspan=5,padx=0,sticky=NSEW)
         self.text.pack(fill="both", expand=True)
         self.text.tag_configure('big2', font=('Arial', 8,'bold'))

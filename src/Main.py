@@ -36,6 +36,7 @@ class Main:
         self.Num_patch   =       0               #total number of patches
         self.time_flag   =   False               #time flag
         self.u_flag      =   False               #displacement flag
+        self.rendObj     =   None
         self.wbez        =   np.array([])        #Bezier weight per patch
         self.Input       =   Input
         
@@ -164,10 +165,11 @@ class Main:
         self.TextEntry('Total number of timesteps     :%d\n'%(self.tstep))
         self.timeCounter2 =    time.perf_counter()
         
+        self.WithoutDisplacement()
         if self.time_flag==True:
           self.getDisplacement(input_t)
-        else:
-            self.WithoutDisplacement()
+        # else:
+        #     self.WithoutDisplacement()
             
     def getDisplacement(self,input_t):
         
@@ -209,14 +211,17 @@ class Main:
         
     def WithoutDisplacement(self):
         
+        self.vtu.ufl=False
         self.progress['value']+=(20)
         self.root.update()
         self.TextEntry('====Writing VTK files====\n')
-        print(len(self.wbez))
         
         timeCounter2 = time.perf_counter()
         
-        self.vtu.uparaview()
+        if self.Input["simple Flag"]:
+            self.rendObj=self.vtu.paraviewSimple()
+        else:
+            self.vtu.uparaview()
         
         self.progress['value']+=30
         self.root.update()
@@ -229,7 +234,7 @@ class Main:
                        second(s)\n')
         self.TextEntry(f'Output file writen in {timeCounter3-timeCounter2} second(s)\n')
         self.TextEntry("VTU files written to paraview folder in {}\n"
-                       .format(self.Input["destination file path"])) 
+                       .format(self.Input["destination file path"]))
 
 class sh:
     

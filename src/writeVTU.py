@@ -190,6 +190,7 @@ class writeVTU:
             
     def paraviewSimple(self,nstep=0,u=0):
         
+        tp=None
         # c_dir = os.getcwd()
         path = os.path.join(self.path, r'Paraview')
         if not os.path.exists(path):
@@ -324,6 +325,8 @@ class writeVTU:
             
         writer.FileName=path+'\\'+filename
         writer.UpdatePipeline()
+        
+        return tp
     
 def paraview_module():
     return par
