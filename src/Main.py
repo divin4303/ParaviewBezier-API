@@ -76,8 +76,8 @@ class Main:
             self.x[i][1]=y[i]
             self.x[i][2]=z[i]
          
-        self.TextEntry(f"{len(self.fileInfo['patch start'])} parts(s)")
-        self.TextEntry(f'{len(y)} NURBS Control points\n')
+        self.TextEntry(f"number of parts : {len(self.fileInfo['patch start'])}\n")
+        self.TextEntry(f'NURBS Control points : {len(y)}\n')
                        
         self.no_of_nodes  =    len(y)
         self.timeCounter1 =    time.perf_counter()
@@ -90,8 +90,8 @@ class Main:
         if not path:
             self.TextEntry("no d3plot files given\n")
         elif self.Input["dispFlag"]== "False" and self.Input["strFlag"]=="False":
-            self.TextEntry("No displacement results or")
-            self.TextEntry("stress results are selected\n")
+            self.TextEntry("No displacement or")
+            self.TextEntry(" stress results are selected\n")
         else:
             self.u,self.tstep=Read_d3plot.read_d3plot(path,3,
                                                       self.no_of_nodes,self.x)
@@ -168,8 +168,14 @@ class Main:
         self.WithoutDisplacement()
         if self.time_flag==True:
           self.getDisplacement(input_t)
-        # else:
-        #     self.WithoutDisplacement()
+          
+        self.TextEntry("==========\n")
+        self.TextEntry("***FINISHED***\n")
+        self.TextEntry(f'Read and process the file in {self.timeCounter2-self.timeCounter1}\
+                       second(s)\n')
+        self.TextEntry(f'Output file writen in {self.timeCounter3-self.timeCounter2} second(s)\n')
+        self.TextEntry("VTU files written in {}/paraview\n"
+                       .format(self.Input["destination file path"]))
             
     def getDisplacement(self,input_t):
         
@@ -195,46 +201,30 @@ class Main:
              for i in tstep:
                 s.calcDisp(i)
                 
-        timeCounter2 =    time.perf_counter() 
+        self.timeCounter3 =    time.perf_counter() 
         progress['value']+=50
-        root.update()
-        self.TextEntry("==========\n")
-        self.TextEntry("***FINISHED***\n")
-        self.TextEntry(f'before starting to write files {self.timeCounter2-self.timeCounter1} second(s)\n')
-        self.TextEntry(f'Output file writen in {timeCounter2-self.timeCounter2} second(s)\n')
-        self.TextEntry("VTU files written to paraview folder in {}\n"
-                        .format(self.Input["destination file path"]))
-        
+        root.update() 
         print("***FINISHED***\n")
                 
 
         
     def WithoutDisplacement(self):
         
+        temp=self.vtu.ufl
         self.vtu.ufl=False
-        self.progress['value']+=(20)
-        self.root.update()
-        self.TextEntry('====Writing VTK files====\n')
-        
-        timeCounter2 = time.perf_counter()
+        if not temp:
+            self.progress['value']+=(20)
+            self.root.update()
         
         if self.Input["simple Flag"]:
             self.rendObj=self.vtu.paraviewSimple()
         else:
             self.vtu.uparaview()
-        
-        self.progress['value']+=30
-        self.root.update()
-        
-        timeCounter3 = time.perf_counter()
-     
-        self.TextEntry("==========\n")
-        self.TextEntry("***FINISHED***\n")
-        self.TextEntry(f'Read and process the file in {timeCounter2-self.timeCounter1}\
-                       second(s)\n')
-        self.TextEntry(f'Output file writen in {timeCounter3-timeCounter2} second(s)\n')
-        self.TextEntry("VTU files written to paraview folder in {}\n"
-                       .format(self.Input["destination file path"]))
+        if not temp:
+            self.progress['value']+=30
+            self.root.update()
+        self.vtu.ufl=temp
+        self.timeCounter3 = time.perf_counter()
 
 class sh:
     

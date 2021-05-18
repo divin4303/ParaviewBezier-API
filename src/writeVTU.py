@@ -28,6 +28,14 @@ class writeVTU:
         self.order  =global_order   #order of each patch
         self.comp   =Input["compFlag"]
         self.path   =Input["destination file path"]
+        self.CompressionLevel=Input['Compression Level']
+        self.CompressorMode=Input['Compressor Mode']
+        if Input['Compressor Type']=='fastest':
+            self.CompressorType=1
+        elif Input['Compressor Type']=='balanced':
+            self.CompressorType=2
+        else:
+            self.CompressorType=3
         
     def Set(self,filename,timefl=False,ufl=False):
         
@@ -50,8 +58,9 @@ class writeVTU:
                   
             vtu_read = XMLUnstructuredGridReader(FileName=[filename])
             writer = XMLUnstructuredGridWriter \
-            (FileName=[filename],CompressorType=3,CompressionLevel=9) 
-            writer.DataMode="Binary" # appended, ascii
+            (FileName=[filename],CompressorType=self.CompressorType,
+             CompressionLevel=self.CompressionLevel) 
+            writer.DataMode=self.CompressorMode # appended, ascii
             writer.UpdatePipeline()
                 
     def uparaview(self,nstep=0,u=0):
@@ -317,11 +326,13 @@ class writeVTU:
         'write ascii data============================================='
         if self.comp=="True":
             
-            writer = XMLUnstructuredGridWriter(Input=tp,CompressorType=3,CompressionLevel=9)
-            writer.DataMode="Binary"
+            writer = XMLUnstructuredGridWriter(Input=tp,
+                                               CompressorType=self.CompressorType,
+                                               CompressionLevel=self.CompressionLevel)
+            writer.DataMode=self.CompressorMode
         else:
             writer = XMLUnstructuredGridWriter(Input=tp)
-            writer.DataMode="Ascii"
+            writer.DataMode=self.CompressorMode
             
         writer.FileName=path+'\\'+filename
         writer.UpdatePipeline()
