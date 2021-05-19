@@ -139,10 +139,11 @@ class InterFace:
     
     def open_Geomtery(self):
         
-        vtu_read = self.main.rendObj
-        Show(vtu_read)
-        Interact()
-        
+        if paraview_module()== True:
+            vtu_read = self.main.rendObj
+            Show(vtu_read)
+            Interact()
+    
     def interface(self):
         
         label1=Label(self.root,text="File Location :")

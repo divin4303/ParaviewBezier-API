@@ -176,6 +176,8 @@ class Main:
         self.TextEntry(f'Output file writen in {self.timeCounter3-self.timeCounter2} second(s)\n')
         self.TextEntry("VTU files written in {}/paraview\n"
                        .format(self.Input["destination file path"]))
+        print("***FINISHED***\n")
+        print(self.progress['value'])
             
     def getDisplacement(self,input_t):
         
@@ -204,7 +206,6 @@ class Main:
         self.timeCounter3 =    time.perf_counter() 
         progress['value']+=50
         root.update() 
-        print("***FINISHED***\n")
                 
 
         
@@ -212,15 +213,15 @@ class Main:
         
         temp=self.vtu.ufl
         self.vtu.ufl=False
-        if not temp:
-            self.progress['value']+=(20)
+        
+        if temp==False or self.time_flag==False:
+            self.progress['value']+=20
             self.root.update()
         
-        if self.Input["simple Flag"]:
+        if paraview_module()== True:
             self.rendObj=self.vtu.paraviewSimple()
-        else:
-            self.vtu.uparaview()
-        if not temp:
+
+        if temp==False or self.time_flag==False:
             self.progress['value']+=30
             self.root.update()
         self.vtu.ufl=temp
@@ -258,7 +259,9 @@ class sh:
                                                 self.u[t,:,:],self.global_ixbez)
                 ubez          =   np.row_stack((ubez,patch_ubez))
         
-        if self.simpleFlag:
+        
+        if self.simpleFlag==True:
+            print(self.simpleFlag)
             self.vtu.paraviewSimple(t,ubez)
         else:
             self.vtu.uparaview(t,ubez)
