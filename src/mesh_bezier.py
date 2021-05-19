@@ -26,6 +26,7 @@ import Directional_Extract_Op
 import uniqueBez
 
 import time
+# import h5py
 'from memory_profiler import profile'
 
 def bez_patch(ndm,patch_info,knot_r,knot_s,knot_t,conn,w,x,numpbez):
@@ -129,7 +130,8 @@ def bez_patch(ndm,patch_info,knot_r,knot_s,knot_t,conn,w,x,numpbez):
     ixbez = ([[0 for i in range(nen)] for j in range(tnel)])
     
     
-    #numpbez=0      
+    #numpbez=0
+    # hf = h5py.File('PatchInfo.h5', 'w')
     for ne in range(1,tnel+1):
         t0=time.time()
         ne_bez = ne

@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Jan 12 18:45:40 2021
-
-@author: User
-"""
 from tkinter import *
 from tkinter import filedialog
 from Main import *
@@ -29,6 +24,9 @@ Author : Divin Xavier (divin.pulakudiyil@st.ovgu.de)\n\
 -----------------------------------------------------------------------\n\
      Modification log                                Date (dd/mm/year)\n\
      Original version                                    xx/xx/2021\n\
+-----------------------------------------------------------------------\n\
+Browse/enter the input and destination file location and PRESS load    \n\
+keyword button to load see the timestep information\n\
 -----------------------------------------------------------------------\n'
 margin='-----------------------------------------------------------------------\n'
 class InterFace:
@@ -57,18 +55,25 @@ class InterFace:
         self.simpleFlag=False
         self.interface()
     
+    'to get the path to file location'
     def file_opener1(self):
         
         self.e1.delete(0, 'end')
         filename = filedialog.askopenfilename(initialdir=os.getcwd())
         self.e1.insert(END, filename)
-
+     
+        
+     
+    'to get the destination path (by default it is cwd)'
     def file_opener2(self):
         
         self.e2.delete(0, 'end')
         filepath = filedialog.askdirectory(initialdir=os.getcwd())
         self.e2.insert(0, filepath)
     
+    
+    
+    'to get the keyword file information and checkbox details'
     def CheckButton(self):
         
         self.filepath, self.filename = ntpath.split(self.e1.get())
@@ -113,7 +118,8 @@ class InterFace:
             self.main=Main(path,self.Input,self.root,self.text,self.progress,
                            lines)
             
-            label3      = tk.Label(self.root,text=f"Total Available :  {self.main.tstep}")
+            label3      = tk.Label(self.root,
+                                   text=f"Total Available :  {self.main.tstep}")
 
             label3.grid(row=9,column=3,columnspan=1,padx=50,pady=10)
                 
@@ -121,15 +127,18 @@ class InterFace:
             # 'File not found' error message.
             print(f'{self.Input["filename"]} keyword file not found')
     
+    
+    
+    'directs to the main routine for computation'
     def Submitbutton(self):
         
-        Input_t=0
+        Input_t=[]
         if self.main.time_flag==True:
-            Input_t=int(self.e3.get())
-            
-            if Input_t==0:
+            Input_t.append(int(self.e3.get()))
+            Input_t.append(int(self.timeStepEnd.get()))
+            if int(self.e3.get())==0:
                 self.main.time_flag=False
-                self.e1.insert(tk.END,'Time step not selected\n')
+                self.text.insert(tk.END,'Time step not selected\n')
         
         self.Input.update({
             'Compressor Type'  :self.CompressorType.get(),
@@ -137,32 +146,37 @@ class InterFace:
             'Compressor Mode'  :self.CompressorMode.get()})
         self.main.getBezierPoints(Input_t)
     
+    
+    
+    'open geometry from GUI'
     def open_Geomtery(self):
         
         if paraview_module()== True:
             vtu_read = self.main.rendObj
             Show(vtu_read)
             Interact()
+            
     
+    
+    'interface design loaded from __init__ method'
     def interface(self):
         
         label1=Label(self.root,text="File Location :")
         label2=Label(self.root,text="Destination  :")
         
-        
-        
         button_browse1=Button(self.root, text ='Browse', command = self.file_opener1)
         button_browse2=Button(self.root, text ='Browse', command = self.file_opener2)
         
-        opt1=Checkbutton(self.root,text="Displacement",variable=self.r,\
+        opt1=Checkbutton(self.root,text="Displacement",variable=self.r,
                          onvalue="True",offvalue="False")
-        opt2=Checkbutton(self.root,text="Stress",variable=self.s,\
+        opt2=Checkbutton(self.root,text="Stress",variable=self.s,
                          onvalue="True",offvalue="False")
-        opt3=Checkbutton(self.root,text="Parallel Processing",variable=self.p,\
+        opt3=Checkbutton(self.root,text="Parallel Processing",variable=self.p,
                          onvalue="True",offvalue="False")
         
         button_quit=Button(self.root,text=" Quit ",command=self.root.destroy)
-        button_accept=Button(self.root,text="Check",command=self.CheckButton)
+        button_accept=Button(self.root,text="Load Keyword",
+                             command=self.CheckButton)
         
         opt1.deselect()
         opt2.deselect()
@@ -191,29 +205,30 @@ class InterFace:
         openGeomtery =Button(self.root, text ='Open Geometry', 
                              command = self.open_Geomtery)
     
-        label4      = tk.Label(self.root,text="Time Steps : Desired")
+        label4      = tk.Label(self.root,text="Desired Time Steps : from-to")
         self.e3     = Entry(self.root,width=35,borderwidth=5)
+        self.timeStepEnd     = Entry(self.root,width=35,borderwidth=5)
         
         OPTIONS = list(range(1,10))
         variable = StringVar(self.root)
         variable.set(str(OPTIONS[0]))
-        CompressorType_label      = tk.Label(self.root,text="Compressor Type :")
-        self.CompressorType = ttk.Combobox(self.root,state="readonly" ,value= 
-                                    ["fastest", "balanced", "smallest"])
-        self.CompressorType.current(2)
-        CompressionLevel_label      = tk.Label(self.root,text="Compressor Level :")
+        CompressorType_label= tk.Label(self.root,text="Compressor Type :")
+        self.CompressorType = ttk.Combobox(self.root,state="readonly" ,
+                                           value= ["fastest", "balanced", "smallest"])
+        CompressionLevel_label      = tk.Label(self.root,
+                                               text="Compressor Level :")
         self.CompressionLevel = ttk.Combobox(self.root,state="readonly",
                                              value=list(map(str,OPTIONS)))
+        CompressorMode_label      = tk.Label(self.root,
+                                             text="Compressor data mode :")
+        self.CompressorMode = ttk.Combobox(self.root,state="readonly",
+                                           value= ["Ascii", "Binary"])
         self.CompressionLevel.current(8)
-        
-        CompressorMode_label      = tk.Label(self.root,text=
-                                              "Compressor data mode :")
-        self.CompressorMode = ttk.Combobox(self.root,state="readonly", value= 
-                                    ["Ascii", "Binary"])
+        self.CompressorType.current(2)
         self.CompressorMode.current(0)
         
         self.e3.insert(0, 0)
-        
+        self.timeStepEnd.insert(0, 0)
         
         label1.grid(row=0,column=0,columnspan=1,padx=10,pady=10,sticky="W")
         label2.grid(row=1,column=0,columnspan=1,padx=10,pady=10,sticky="W")
@@ -247,16 +262,16 @@ class InterFace:
         
         label4.grid(row=9,column=0,columnspan=1,padx=10,pady=10)
         self.e3.grid(row=9,column=1,columnspan=1,padx=10,pady=10)
+        self.timeStepEnd.grid(row=9,column=2,columnspan=1,padx=10,pady=10)
         self.text.pack(fill="both", expand=True)
         self.root.grid_columnconfigure(0, uniform="uniform", weight=1)
         self.root.grid_rowconfigure(11, weight=1)
         self.root.grid_columnconfigure(4, weight=100)
-        self.intro()
+        self.text.insert(tk.END,intro_text)
         
         self.root.mainloop()
-    
-    def intro(self):
-        self.text.insert(tk.END,intro_text)
+
+        
     
 if __name__=='__main__':
     

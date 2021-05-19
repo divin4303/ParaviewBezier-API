@@ -181,10 +181,10 @@ class Main:
             
     def getDisplacement(self,input_t):
         
-        self.tstep=input_t
+        self.tstep=input_t[1]
         progress=self.progress
         root=self.root
-        tstep   =list(range(0,self.tstep,1))
+        tstep   =list(range(input_t[0],self.tstep,1))
         s=sh(self.fileInfo,self.patch,self.df,self.u,
              self.global_ixbez,self.vtu,self.Input)
         # s.Set(self.e1,self.progress,self.root,self.tstep)
@@ -211,20 +211,27 @@ class Main:
         
     def WithoutDisplacement(self):
         
-        temp=self.vtu.ufl
+        temp1=self.vtu.ufl
+        temp2=self.vtu.timefl
         self.vtu.ufl=False
+        self.vtu.timefl=False
         
-        if temp==False or self.time_flag==False:
+        if temp1==False or self.time_flag==False:
             self.progress['value']+=20
             self.root.update()
         
         if paraview_module()== True:
             self.rendObj=self.vtu.paraviewSimple()
-
-        if temp==False or self.time_flag==False:
+        else:
+            self.vtu.uparaview()
+            
+        if temp1==False or self.time_flag==False:
             self.progress['value']+=30
             self.root.update()
-        self.vtu.ufl=temp
+            
+        self.vtu.ufl=temp1
+        self.vtu.timefl=temp2
+        
         self.timeCounter3 = time.perf_counter()
 
 class sh:
