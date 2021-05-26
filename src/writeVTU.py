@@ -196,6 +196,7 @@ class writeVTU:
         
         if self.comp=="True":
             self.compress(path+'\\'+filename)
+        return path+'\\'+filename
             
     def paraviewSimple(self,nstep=0,u=0):
         
@@ -337,7 +338,7 @@ class writeVTU:
         writer.FileName=path+'\\'+filename
         writer.UpdatePipeline()
         
-        return tp
+        return path+'\\'+filename
     
 def paraview_module():
     return par

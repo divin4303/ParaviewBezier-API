@@ -53,6 +53,7 @@ class Main:
     def TextEntry(self,text):
         
         self.e1.insert(tk.END,text)
+        self.e1.see(tk.END)
         self.root.update()    
         
     def LoadCoordinates(self):
@@ -95,8 +96,7 @@ class Main:
         else:
             self.u,self.tstep=Read_d3plot.read_d3plot(path,3,
                                                       self.no_of_nodes,self.x)
-            self.TextEntry(f"{len(path)} d3plot file(s) with \
-                           {self.tstep} timestep(s)\n")
+            self.TextEntry(f"{len(path)} d3plot file(s) with {self.tstep} timestep(s)\n")
             
             if self.u.size:
                 self.u_flag=True
@@ -111,7 +111,7 @@ class Main:
         
     def getBezierPoints(self,input_t):
         
-        print(self.fileInfo)
+        # print(self.fileInfo)
         
         for i in range(len(self.fileInfo['patch start'])):
             s       = []
@@ -161,7 +161,7 @@ class Main:
                             self.nen,self.wbez,self.BezPoints,self.global_ixbez,
                             self.global_order,self.Input)
         self.vtu.Set(self.Input["filename"],self.time_flag,self.u_flag)
-        self.TextEntry('====Extracting displacement information====\n')
+        self.TextEntry('Extracting displacement information...\n')
         self.TextEntry('Total number of timesteps     :%d\n'%(self.tstep))
         self.timeCounter2 =    time.perf_counter()
         
@@ -169,15 +169,14 @@ class Main:
         if self.time_flag==True:
           self.getDisplacement(input_t)
           
-        self.TextEntry("==========\n")
+        self.TextEntry('-----------------------------------------------------------------------\n')
         self.TextEntry("***FINISHED***\n")
-        self.TextEntry(f'Read and process the file in {self.timeCounter2-self.timeCounter1}\
-                       second(s)\n')
+        self.TextEntry(f'Read and processed the file in {self.timeCounter2-self.timeCounter1} second(s)\n')
         self.TextEntry(f'Output file writen in {self.timeCounter3-self.timeCounter2} second(s)\n')
         self.TextEntry("VTU files written in {}/paraview\n"
                        .format(self.Input["destination file path"]))
         print("***FINISHED***\n")
-        print(self.progress['value'])
+        # print(self.progress['value'])
             
     def getDisplacement(self,input_t):
         
@@ -189,8 +188,8 @@ class Main:
              self.global_ixbez,self.vtu,self.Input)
         # s.Set(self.e1,self.progress,self.root,self.tstep)
         
-        self.TextEntry('====Calculating Bezier displacement====\n')
-        self.TextEntry('====Writing VTK files====\n')
+        self.TextEntry('Calculating Bezier displacement...\n')
+        self.TextEntry('Writing VTK files\n')
         
         if self.Input["Parallel processing"]=="True":
               self.TextEntry("Parallel processing enabled\n")
@@ -221,9 +220,9 @@ class Main:
             self.root.update()
         
         if paraview_module()== True:
-            self.rendObj=self.vtu.paraviewSimple()
+            self.filename=self.vtu.paraviewSimple()
         else:
-            self.vtu.uparaview()
+            self.filename=self.vtu.uparaview()
             
         if temp1==False or self.time_flag==False:
             self.progress['value']+=30
