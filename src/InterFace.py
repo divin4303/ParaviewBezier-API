@@ -24,7 +24,7 @@ Author : Divin Xavier (divin.pulakudiyil@st.ovgu.de)\n\
          Germany\n\
 -----------------------------------------------------------------------\n\
      Modification log                                Date (dd/mm/year)\n\
-     Original version                                    xx/xx/2021\n\
+     Original version                                    02/04/2021\n\
 -----------------------------------------------------------------------\n\
 Browse or Enter the input and destination file location.\n\
 Press \'Load Files\' button to load the input files\n\
@@ -121,7 +121,7 @@ class InterFace:
             label3      = tk.Label(self.root,
                                    text=f"Total Available :  {self.main.tstep}")
 
-            label3.grid(row=11,column=3,columnspan=1,padx=5)
+            label3.grid(row=12,column=2,columnspan=1,padx=5)
             self.text.insert(END,'*FINISHED* reading input file(s)\n')
             self.text.insert(END,margin)
             self.text.insert(END,'Computing Bezier Coordinate(s)...\n')
@@ -181,7 +181,8 @@ class InterFace:
         
         actor=vtk.vtkActor()
         actor.SetMapper(mapper)
-    
+        actor.GetProperty().EdgeVisibilityOn()
+        
         renderer = vtk.vtkRenderer()
         renderer.AddActor(actor)
         renderer.ResetCamera()
@@ -200,14 +201,16 @@ class InterFace:
         renderWindow.Render()
         interactor.Initialize()
         interactor.Start()
-                    
-            
-            
+    
+    def BEXTfile(self):
+        
+        self.main.BEXT.uparaview(self.Input["filename"])
+        
     'interface design loaded from __init__ method'
     def interface(self):
         
         label1=Label(self.root,text="File Location :")
-        label2=Label(self.root,text="Destination  :")
+        label2=Label(self.root,text="Destination :")
         
         button_browse1=Button(self.root, text ='Browse', 
                               command = self.file_opener1,width=10)
@@ -251,10 +254,8 @@ class InterFace:
                              command = self.Submitbutton,width=10)
         openGeomtery =Button(self.root, text ='Open Geometry', 
                              command = self.open_Geomtery)
-    
-        label4      = tk.Label(self.root,text="Desired Time Steps : from-to")
-        self.e3     = Entry(self.root,width=8,borderwidth=5)
-        self.timeStepEnd     = Entry(self.root,width=8,borderwidth=5)
+        genBEXTButton =Button(self.root, text ='Generate BEXT File', 
+                             command = self.BEXTfile,width=25)
         
         OPTIONS = list(range(1,10))
         variable = StringVar(self.root)
@@ -274,17 +275,31 @@ class InterFace:
         self.CompressorType.current(2)
         self.CompressorMode.current(0)
         
-        self.e3.insert(0, 0)
-        self.timeStepEnd.insert(0, 0)
         timeStepLabel      = tk.Label(self.root,text="Total Available :  0")
+        NB_label= tk.Label(self.root,text=
+        'NB : Compressor Type, Level and Data Mode options are acitvated only if Compress VTU button is enabled',
+        width=80)
+        
+        gridframe = tk.Frame(self.root)
+        label4      = tk.Label(gridframe,text="Desired Time Steps :     From-  ")\
+            .pack(side=tk.LEFT)
+        self.e3     = Entry(gridframe,width=7,borderwidth=5)
+        self.e3.pack(side=tk.LEFT)
+        self.e3.insert(0, 0)
+        timestep_to_label=tk.Label(gridframe,text=' To-  ').pack(side=tk.LEFT)
+        self.timeStepEnd     = Entry(gridframe,width=7,borderwidth=5)
+        self.timeStepEnd.pack(side=tk.LEFT)
+        self.timeStepEnd.insert(0, 0)
         
         canvas_1 = Canvas(self.root, width=80,height=2)
         canvas_1.create_line(0, 3, 10000,3, width = 2)
+        canvas_2 = Canvas(self.root, width=80,height=2)
+        canvas_2.create_line(0, 3, 10000,3, width = 2)
 
-        label1.grid(row=0,column=0,columnspan=1,padx=5,sticky="W")
+        label1.grid(row=0,column=0,columnspan=1,padx=5,pady=10,sticky="W")
         label2.grid(row=1,column=0,columnspan=1,padx=5,sticky="W")
         
-        button_browse1.grid(row=0,column=4,columnspan=1,padx=5,sticky="W")
+        button_browse1.grid(row=0,column=4,columnspan=1,padx=5,pady=10,sticky="W")
         button_browse2.grid(row=1,column=4,columnspan=1,padx=5,sticky="W")
         
         self.e1.grid(row=0,column=1,columnspan=3,padx=5,sticky="EW")
@@ -298,26 +313,31 @@ class InterFace:
         
         button_accept.grid(row=6,column=4,padx=5,pady=10,sticky="W")
         canvas_1.grid(row=7, column=0,columnspan=6,sticky='NSEW')
-        CompressorMode_label.grid(row=8,column=0,padx=5,pady=5,sticky="W")
-        self.CompressorMode.grid(row=8,column=1,padx=5,pady=5,sticky="W")
-        CompressorType_label.grid(row=9,column=0,padx=5,pady=5,sticky="W")
-        self.CompressorType.grid(row=9,column=1,padx=5,pady=5,sticky="W")
-        CompressionLevel_label.grid(row=10,column=0,padx=5,pady=5,sticky="W")
-        self.CompressionLevel.grid(row=10,column=1,padx=5,pady=5,sticky="W")
-        label4.grid(row=11,column=0,columnspan=1,padx=5,pady=5,sticky="W")
-        self.e3.grid(row=11,column=1,columnspan=1,padx=5,pady=5,sticky="W")
-        self.timeStepEnd.grid(row=11,column=2,columnspan=1,padx=5,pady=5,sticky="W")
-        timeStepLabel.grid(row=11,column=3,columnspan=1,padx=5,sticky="W")
-        submitButton.grid(row=11,column=4,columnspan=1,padx=5,pady=5,sticky="W")
-        self.progress.grid(row=12,column=1,columnspan=2,padx=10,pady=10,sticky="EW")
-        label3.grid(row=12,column=0,columnspan=1,padx=5,pady=5,sticky="W")
-        openGeomtery.grid(row=12,column=3,columnspan=1,padx=5,pady=5,sticky="W")
-        button_quit.grid(row=12,column=4,padx=5,pady=10,sticky="W")
-        chat_space.grid(row=13,column=0,columnspan=6,padx=5,pady=5,sticky='NSEW')
+        NB_label.grid(row=8,column=0,columnspan=6,padx=5,sticky="W")
+        CompressorMode_label.grid(row=9,column=0,padx=5,pady=5,sticky="W")
+        self.CompressorMode.grid(row=9,column=1,padx=5,pady=5,sticky="W")
+        CompressorType_label.grid(row=10,column=0,padx=5,pady=5,sticky="W")
+        self.CompressorType.grid(row=10,column=1,padx=5,pady=5,sticky="W")
+        CompressionLevel_label.grid(row=11,column=0,padx=5,pady=5,sticky="W")
+        self.CompressionLevel.grid(row=11,column=1,padx=5,pady=5,sticky="W")
+        gridframe.grid(row=12,column=0,columnspan=2,padx=5,pady=5,sticky="W")
+        # label4.grid(row=12,column=0,padx=5,pady=5,sticky="W")
+        # self.e3.grid(row=12,column=1,padx=5,pady=5,sticky="W")
+        # timestep_to_label.grid(row=12,column=2,padx=5,sticky="W")
+        # self.timeStepEnd.grid(row=12,column=3,columnspan=1,padx=5,pady=5,sticky="W")
+        timeStepLabel.grid(row=12,column=2,padx=5,sticky="w")
+        submitButton.grid(row=12,column=4,columnspan=1,padx=5,pady=5,sticky="W")
+        canvas_2.grid(row=14, column=0,columnspan=6,sticky='NSEW')
+        genBEXTButton.grid(row=15,column=3,columnspan=2,padx=5,pady=5,sticky="W")
+        self.progress.grid(row=15,column=1,columnspan=2,padx=5,sticky="EW")
+        label3.grid(row=15,column=0,columnspan=1,padx=5,pady=5,sticky="W")
+        openGeomtery.grid(row=16,column=3,columnspan=1,padx=5,pady=5,sticky="W")
+        button_quit.grid(row=16,column=4,padx=5,pady=10,sticky="W")
+        chat_space.grid(row=17,column=0,columnspan=6,padx=5,pady=5,sticky='NSEW')
         
         self.text.pack(fill="both", expand=True)
         self.root.grid_columnconfigure(2, uniform="uniform", weight=1)
-        self.root.grid_rowconfigure(13, uniform="uniform", weight=1)
+        self.root.grid_rowconfigure(17, uniform="uniform", weight=1)
         # self.root.grid_rowconfigure(11, weight=1)
         # self.root.grid_columnconfigure(4, weight=100)
         self.text.insert(tk.END,intro_text)
@@ -333,6 +353,7 @@ if __name__=='__main__':
     try:
         os.remove('temp.k')
         os.remove('temp1.k')
+        os.remove('PatchInfo.h5')
     except:
         print('no temp file created')
     root.mainloop()

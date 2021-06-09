@@ -26,7 +26,7 @@ import Directional_Extract_Op
 import uniqueBez
 
 import time
-# import h5py
+import h5py
 'from memory_profiler import profile'
 
 def bez_patch(ndm,patch_info,knot_r,knot_s,knot_t,conn,w,x,numpbez):
@@ -130,8 +130,8 @@ def bez_patch(ndm,patch_info,knot_r,knot_s,knot_t,conn,w,x,numpbez):
     ixbez = ([[0 for i in range(nen)] for j in range(tnel)])
     
     
-    #numpbez=0
-    # hf = h5py.File('PatchInfo.h5', 'w')
+    arrays=[]
+    hf = h5py.File('PatchInfo.h5', 'w')
     for ne in range(1,tnel+1):
         t0=time.time()
         ne_bez = ne
@@ -189,12 +189,28 @@ def bez_patch(ndm,patch_info,knot_r,knot_s,knot_t,conn,w,x,numpbez):
             bezloc,wbezloc=BezierCoord.Bezier_loc(w_local,IXloc,C,x_local,nen,\
                                                   ne_bez,ndm,p,q,r)
         
-        t1=time.time()
+        arrays.append(np.pad(C,((0, 0), (0, 0))))
+        
         BezPoints,wbez,patch_numpbez,ixbez=uniqueBez.Unique(BezPoints,wbez,bezloc\
                                             ,wbezloc,ixbez,nen,ptol,ndm,nd_bez\
                                             ,ne_bez,patch_numpbez,p,q,r)
-        t2=time.time()
+    stacked_Carray = np.stack(arrays)
     
-    return BezPoints,wbez,patch_numpbez[1],ixbez,nen,tnel
+    'Stores patch information in h5py files'
+    hf.create_dataset('C_{}'.format(patch_info['numpatch']), data=stacked_Carray)
+    hf.create_dataset('Conn_{}'.format(patch_info['numpatch']), data=IX)
+    patchInfo=hf.create_group('patchInfo{}'.format(patch_info['numpatch']))
+    
+    patch_info.update({
+                    'number of elements'     :tnel,
+                    'number of element nodes':nen,
+                    'ncv':stacked_Carray.shape[1]})
+    
+    for key,value in patch_info.items():
+                patchInfo.create_dataset(key, data=value)
+                
+    
+    
+    return BezPoints,wbez,patch_numpbez[1],ixbez,nen,tnel,patch_info
 
 

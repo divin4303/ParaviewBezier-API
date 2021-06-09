@@ -14,6 +14,19 @@ output: n,m,l: number of nodal points in r,s,t dir.
         knot_r,knot_S,knot_t: number of elemtns in r,s,t dir.
 ======================================
 """
+import numpy as np
+def sortweights(x,conn,wght):
+
+    conn=np.append(np.reshape(conn,(1,-1)),np.reshape(wght,(1,-1)))
+    conn=np.reshape(conn,(2,-1))
+    conn=conn[:,np.argsort(conn[0, :])]
+    
+    for i in range(0,x.shape[0]):
+        index=np.where(np.array(conn[0,:])==i+1)
+        if len(index[0]):
+            x[i][3]=conn[1][index[0][0]]
+    return x
+
 def multipl(XI,p):
     m=len(XI)-1 
     'for the array index other for end knot '
@@ -41,14 +54,17 @@ def NodeInfo(df,Node_info,ndm):
     position=Node_info
     
     npid= df.iloc[position,0]
-    pid = df.iloc[position,1]
+    pid = int(df.iloc[position,1])
     n   = int(df.iloc[position,2])
     p   = int(df.iloc[position,3])
     rk=n+p+1   #length of knots vector
     
     patch_infos = {
+        'Part ID':pid,
         "n": n,
         "p": p,
+        "q": 0,
+        "r": 0,
     }
     
     if ndm==2:
@@ -81,6 +97,10 @@ def NodeInfo(df,Node_info,ndm):
     position=   position+1 #for wfl
     
     wfl     =   int(df.iloc[position,0])
+    
+    patch_infos.update({
+        'weight flag' : wfl
+        })
           
     position=   position+1 #knot vector information start line
     i       =   0

@@ -18,6 +18,7 @@ from writeVTU import *
 import read
 import Read_d3plot
 import dis_bezier
+from writeBEXT import *
 
     
 class Main:
@@ -76,7 +77,10 @@ class Main:
             self.x[i][0]=x[i]
             self.x[i][1]=y[i]
             self.x[i][2]=z[i]
-         
+        
+        self.fileInfo.update({
+                'Total control points':self.x.shape[0],
+                })
         self.TextEntry(f"number of parts : {len(self.fileInfo['patch start'])}\n")
         self.TextEntry(f'NURBS Control points : {len(y)}\n')
                        
@@ -112,7 +116,7 @@ class Main:
     def getBezierPoints(self,input_t):
         
         # print(self.fileInfo)
-        
+        Elem=0
         for i in range(len(self.fileInfo['patch start'])):
             s       = []
             self.patch   = {}
@@ -132,7 +136,7 @@ class Main:
                     'numpbez'   :self.numpbez,
                     'numpatch'  :self.Num_patch})
                 
-                patch_BezPoints,patch_wbez,self.numpbez,ixbez,nen,temp_tnel=\
+                patch_BezPoints,patch_wbez,self.numpbez,ixbez,nen,temp_tnel,patch_info=\
                 mesh_bezier.bez_patch(ndm,patch_info,knot_r,knot_s,\
                                         knot_t,conn,wght,self.x,self.numpbez)
                     
@@ -153,10 +157,22 @@ class Main:
                                                              self.global_order,patch_info)
                 
                 self.patch.update({'patch_info_{}'.format(self.Num_patch):patch_info})
+                
+                Elem+=patch_info['number of elements']
+            
             self.progress['value']+=(20/len(self.fileInfo['patch start']))
             self.root.update()
-                
         
+        
+        self.fileInfo.update({
+                        'Number of patches':self.Num_patch,
+                        'total number of elements':Elem})
+        #===========BEXT write===========
+        self.TextEntry('Generating BEXT files..\n')
+        x=np.append(self.x,np.zeros((self.x.shape[0],1)),axis=1)
+        x=File_Info.sortweights(x, conn, wght)
+        self.BEXT=WriteBEXT(patch_info,self.fileInfo,wght,x)
+        #===========VTU write============
         self.vtu=writeVTU(self.fileInfo['dimensions'][0],self.numpbez,self.tnel,
                             self.nen,self.wbez,self.BezPoints,self.global_ixbez,
                             self.global_order,self.Input)
@@ -172,7 +188,7 @@ class Main:
         self.TextEntry('-----------------------------------------------------------------------\n')
         self.TextEntry("***FINISHED***\n")
         self.TextEntry(f'Read and processed the file in {self.timeCounter2-self.timeCounter1} second(s)\n')
-        self.TextEntry(f'Output file writen in {self.timeCounter3-self.timeCounter2} second(s)\n')
+        self.TextEntry(f'Output file written in {self.timeCounter3-self.timeCounter2} second(s)\n')
         self.TextEntry("VTU files written in {}/paraview\n"
                        .format(self.Input["destination file path"]))
         print("***FINISHED***\n")
