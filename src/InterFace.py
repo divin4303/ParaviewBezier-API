@@ -26,8 +26,8 @@ Author : Divin Xavier (divin.pulakudiyil@st.ovgu.de)\n\
      Modification log                                Date (dd/mm/year)\n\
      Original version                                    02/04/2021\n\
 -----------------------------------------------------------------------\n\
-Browse or Enter the input and destination file location.\n\
-Press \'Load Files\' button to load the input files\n\
+Browse or enter the input and destination file location.\n\
+Press \'Read Data\' button to load the input files\n\
 -----------------------------------------------------------------------\n'
 margin='-----------------------------------------------------------------------\n'
 class InterFace:
@@ -163,21 +163,21 @@ class InterFace:
         ugrid2   = vtu_read.GetOutput()
         
         colors = vtk.vtkNamedColors()
-        tess = vtk.vtkTessellatorFilter()
-        tess.SetMaximumNumberOfSubdivisions(3);
-        tess.SetInputData(ugrid2);
+        # tess = vtk.vtkTessellatorFilter()
+        # tess.SetMaximumNumberOfSubdivisions(3);
+        # tess.SetInputData(ugrid2);
     
         mapper = vtk.vtkDataSetMapper()
         
-        tessellate=True
+        # tessellate=True
         
-        if tessellate:
+        # if tessellate:
             
-            mapper.SetInputConnection(tess.GetOutputPort())
+        #     mapper.SetInputConnection(tess.GetOutputPort())
             
-        else:
+        # else:
             
-            mapper.SetInputData(ugrid2);
+        mapper.SetInputData(ugrid2);
         
         actor=vtk.vtkActor()
         actor.SetMapper(mapper)
@@ -219,8 +219,8 @@ class InterFace:
         
         opt1=Checkbutton(self.root,text="Displacement",variable=self.r,
                          onvalue="True",offvalue="False")
-        opt2=Checkbutton(self.root,text="Stress",variable=self.s,
-                         onvalue="True",offvalue="False")
+        opt2=Checkbutton(self.root,text="Stress/Strain (To be implement)",variable=self.s,
+                         onvalue="True",offvalue="False",width=23)
         opt3=Checkbutton(self.root,text="Parallel Processing",variable=self.p,
                          onvalue="True",offvalue="False")
         
@@ -236,20 +236,23 @@ class InterFace:
             
             opt4=Checkbutton(self.root,text="Compress VTU",\
                              variable=self.c,onvalue="True",offvalue="False")
-            opt5=Checkbutton(self.root,text="Enable ParaView Writing",\
-                             variable=self.a,onvalue=True,offvalue=False)
+            opt5=Checkbutton(self.root,text="VTU Data Using XMLUnstructuredGridWriter",\
+                             variable=self.a,onvalue=True,offvalue=False,width=33)
             
             opt4.deselect()
             opt5.deselect()
             
             opt4.grid(row=6,column=0,padx=5,sticky="W")
-            opt5.grid(row=5,column=0,padx=5,sticky="W")
+            opt5.grid(row=5,column=0,columnspan=2,padx=5,sticky="W")
         
         self.progress= ttk.Progressbar(self.root,orient=HORIZONTAL,length=300,
                                        mode='determinate')
         label3       = tk.Label(self.root,text="Progress :")
+        scrollbar   =Scrollbar(self.root)
         chat_space   = tk.Frame(self.root, bg="blue")
-        self.text    = tk.Text(chat_space,width=65,height=10,borderwidth=2)
+        self.text    = tk.Text(chat_space,width=65,height=10,
+                               borderwidth=2,yscrollcommand=scrollbar.set)
+        scrollbar.config(command=self.text.yview)
         submitButton =Button(self.root, text ='Submit', 
                              command = self.Submitbutton,width=10)
         openGeomtery =Button(self.root, text ='Open Geometry', 
@@ -281,13 +284,13 @@ class InterFace:
         width=80)
         
         gridframe = tk.Frame(self.root)
-        label4      = tk.Label(gridframe,text="Desired Time Steps :     From-  ")\
+        label4      = tk.Label(gridframe,text="Desired Time Steps : From  ")\
             .pack(side=tk.LEFT)
-        self.e3     = Entry(gridframe,width=7,borderwidth=5)
+        self.e3     = Entry(gridframe,width=8,borderwidth=4)
         self.e3.pack(side=tk.LEFT)
         self.e3.insert(0, 0)
-        timestep_to_label=tk.Label(gridframe,text=' To-  ').pack(side=tk.LEFT)
-        self.timeStepEnd     = Entry(gridframe,width=7,borderwidth=5)
+        timestep_to_label=tk.Label(gridframe,text=' To  ').pack(side=tk.LEFT)
+        self.timeStepEnd     = Entry(gridframe,width=8,borderwidth=4)
         self.timeStepEnd.pack(side=tk.LEFT)
         self.timeStepEnd.insert(0, 0)
         
@@ -306,12 +309,12 @@ class InterFace:
         self.e2.grid(row=1,column=1,columnspan=3,padx=5,sticky="EW")
         
         opt1.grid(row=2,column=0,padx=5,sticky="W")
-        opt2.grid(row=3,column=0,padx=5,sticky="W")
+        opt2.grid(row=3,column=0,columnspan=2,padx=7,sticky="W")
         opt3.grid(row=4,column=0,padx=5,sticky="W")
         # opt2.grid(row=2,column=1,padx=5,sticky="W")
         # opt3.grid(row=2,column=2,padx=5,sticky="W")
         
-        button_accept.grid(row=6,column=4,padx=5,pady=10,sticky="W")
+        button_accept.grid(row=6,column=4,padx=5,pady=5,sticky="W")
         canvas_1.grid(row=7, column=0,columnspan=6,sticky='NSEW')
         NB_label.grid(row=8,column=0,columnspan=6,padx=5,sticky="W")
         CompressorMode_label.grid(row=9,column=0,padx=5,pady=5,sticky="W")
@@ -333,7 +336,8 @@ class InterFace:
         label3.grid(row=15,column=0,columnspan=1,padx=5,pady=5,sticky="W")
         openGeomtery.grid(row=16,column=3,columnspan=1,padx=5,pady=5,sticky="W")
         button_quit.grid(row=16,column=4,padx=5,pady=10,sticky="W")
-        chat_space.grid(row=17,column=0,columnspan=6,padx=5,pady=5,sticky='NSEW')
+        chat_space.grid(row=17,column=0,columnspan=6,pady=5,sticky='NSEW')
+        scrollbar.grid(row=17,column=6,sticky='NSEW')
         
         self.text.pack(fill="both", expand=True)
         self.root.grid_columnconfigure(2, uniform="uniform", weight=1)

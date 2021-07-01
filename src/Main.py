@@ -117,13 +117,13 @@ class Main:
         
         # print(self.fileInfo)
         Elem=0
+        self.BezPoints   =   np.zeros((0,self.fileInfo['dimensions'][0]))
+        self.patch   = {}
         for i in range(len(self.fileInfo['patch start'])):
-            s       = []
-            self.patch   = {}
             
             EOP     =self.fileInfo['patch start'][i]
             ndm     =self.fileInfo['dimensions'][i]
-            self.BezPoints   =   np.zeros((0,ndm))   #Bezier points per patch
+               #Bezier points per patch
             
             while self.fileInfo['patch end'][i]!=EOP:
                 
@@ -177,7 +177,6 @@ class Main:
                             self.nen,self.wbez,self.BezPoints,self.global_ixbez,
                             self.global_order,self.Input)
         self.vtu.Set(self.Input["filename"],self.time_flag,self.u_flag)
-        self.TextEntry('Extracting displacement information...\n')
         self.TextEntry('Total number of timesteps     :%d\n'%(self.tstep))
         self.timeCounter2 =    time.perf_counter()
         
@@ -226,6 +225,7 @@ class Main:
         
     def WithoutDisplacement(self):
         
+        self.TextEntry('Extracting displacement information...\n')
         temp1=self.vtu.ufl
         temp2=self.vtu.timefl
         self.vtu.ufl=False
@@ -235,7 +235,7 @@ class Main:
             self.progress['value']+=20
             self.root.update()
         
-        if paraview_module()== True:
+        if paraview_module()== True and self.Input["simple Flag"]==True:
             self.filename=self.vtu.paraviewSimple()
         else:
             self.filename=self.vtu.uparaview()
@@ -282,8 +282,7 @@ class sh:
                 ubez          =   np.row_stack((ubez,patch_ubez))
         
         
-        if self.simpleFlag==True:
-            print(self.simpleFlag)
+        if self.simpleFlag:
             self.vtu.paraviewSimple(t,ubez)
         else:
             self.vtu.uparaview(t,ubez)
