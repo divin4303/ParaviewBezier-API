@@ -1,5 +1,4 @@
-# Project_work
-## Implementation of Bézier extraction operator to post process NURBS Based LS-DYNA results.
+## ISOGEOMETRIC ANALYSIS: POST-PROCESSING AND VISUALIZATION OF RESULTS USING BÉZIER CELLS
 
 ## How It Works
 1. Excecute InterFace.py in python IDE or cmd.
@@ -9,7 +8,7 @@ python InterFace.py
 This results in following pop up GUI
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/84045203/117933196-97ea8380-b301-11eb-8e07-09a5569e01c0.PNG" alt="GUI_1" width="304">
+  <img src="https://github.com/divin4303/Project_work/files/7143029/Interface.pdf" alt="GUI_1" width="304">
 </p>
 
 2. a). Browse or enter the location of the `keyword` file.  
