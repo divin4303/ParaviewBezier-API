@@ -30,7 +30,8 @@ This results in following pop up GUI
  The results are written in .VTU format and one could visualize the result file in ParaView  
  <p align="center">
  <img width="280" alt="Quarter_ring_model_subD_4" src="https://user-images.githubusercontent.com/56837271/132838146-222dff46-6f0e-47f6-9f50-ff6a371a075e.PNG">
-</p>
+</p>  
+
  ## Notes
  
  The files are avaialable inside `paraview` folder on the destination. if the destination path is not given then the files are avaialble in `working directory`.  
