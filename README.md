@@ -7,8 +7,9 @@ python InterFace.py
 ```
 This results in following pop up GUI
 
-[Interface.pdf](https://github.com/divin4303/Project_work/files/7143037/Interface.pdf)
-
+<p align="center">
+![image](https://user-images.githubusercontent.com/56837271/132837320-60d74e52-c0a9-4ae1-bed8-1003ebf2b228.png)
+</p>
 
 2. a). Browse or enter the location of the `keyword` file.  
    b). Browse or enter the desired location of the resultant `Visualization tool kit` file.  
@@ -18,11 +19,7 @@ This results in following pop up GUI
    c). `Parallel processing` check button executes the timestep data asynchronously.  
    d). `Compressed VTK` check button writes the `Visualization tool kit` file in binary format which otherwise is written in ASCII.  
    e). `Enable ParaView Simple` check button
-4. After selecting the desired options click on `Check` to load the input files.  
-<p align="center">
-  <img src="https://user-images.githubusercontent.com/84045203/117939072-016d9080-b308-11eb-9192-e30ef1b4273f.jpg" alt="GUI_2" width="500">
-</p>
-
+4. After selecting the desired options click on `Check` to load the input files.
    a). `Progress bar` shows the progress of the code  
    b). Desired number of `Time steps` from the `Total available` time steps can be entered into `entry box`.  
        By default the results are written without the vector field information.  
