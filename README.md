@@ -7,9 +7,8 @@ python InterFace.py
 ```
 This results in following pop up GUI
 
-<p align="center">
-  <img src="https://github.com/divin4303/Project_work/files/7143029/Interface.pdf" alt="GUI_1" width="304">
-</p>
+[Interface.pdf](https://github.com/divin4303/Project_work/files/7143037/Interface.pdf)
+
 
 2. a). Browse or enter the location of the `keyword` file.  
    b). Browse or enter the desired location of the resultant `Visualization tool kit` file.  
