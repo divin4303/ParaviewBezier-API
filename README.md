@@ -8,7 +8,7 @@ python InterFace.py
 This results in following pop up GUI
 
 <p align="center">
-![image](https://user-images.githubusercontent.com/56837271/132837320-60d74e52-c0a9-4ae1-bed8-1003ebf2b228.png)
+ <img src=https://user-images.githubusercontent.com/56837271/132837320-60d74e52-c0a9-4ae1-bed8-1003ebf2b228.png>
 </p>
 
 2. a). Browse or enter the location of the `keyword` file.  
