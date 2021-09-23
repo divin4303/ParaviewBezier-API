@@ -1,5 +1,5 @@
-## ParaviewBezier- An API for post-processing IGA results
-*Latest version: v1.0(23 Spetember 2021)*
+## ParaviewBezier- An API for post-processing IGA results [![Gitter](https://badges.gitter.im/ParaviewBezier-API/community.svg)](https://gitter.im/ParaviewBezier-API/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+*Latest version: v1.0(23 Spetember 2021)* 
 
 Isogeometric analysis results are generally plotted on approximated linear FE-discretization, which causes loss in the visualization quality. Since ParaView supports splines in the form of Bézier cells, There is now a possibility to visualize geometrically exact results. 
 
