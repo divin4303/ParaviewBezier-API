@@ -1,5 +1,16 @@
 ## ParaviewBezier- An API for post-processing IGA results
-This API is designed to post-process the results from NURBS-based IGA simulations performed on LS-DYNA, using the Bézier cells of ParaView.
+*Latest version: v1.0(23 Spetember 2021)*
+
+Isogeometric analysis results are generally plotted on approximated linear FE-discretization, which causes loss in the visualization quality. Since ParaView supports splines in the form of Bézier cells, There is now a possibility to visualize geometrically exact results. 
+
+This API is designed to post-process the results (currently only displacement) from NURBS-based IGA simulations performed on LS-DYNA, using the Bézier cells of ParaView.
+
+This API includes the following features:
+
+* Post-processing NURBS meshes using Bézier elements in ParaView
+* Compress VTU file(s) on demand
+* Parallel processing the task(s) on demand
+* Inbuild *Open Geometry* button to view/interact with geometry
 ## How it Works
 1. Excecute InterFace.py in python IDE or cmd
 ```
@@ -7,7 +18,7 @@ python InterFace.py
 ```
 This results in following pop up GUI
 
-<p align="center">
+<p align="left">
  <img src=https://user-images.githubusercontent.com/56837271/132837320-60d74e52-c0a9-4ae1-bed8-1003ebf2b228.png width="350">
 </p>
 
@@ -28,11 +39,22 @@ This results in following pop up GUI
  
  ## What to expect
  The results are written in .VTU format and one could visualize the result file in ParaView  
- <p align="center">
+ <p align="left">
  <img width="280" alt="Quarter_ring_model_subD_4" src="https://user-images.githubusercontent.com/56837271/132838146-222dff46-6f0e-47f6-9f50-ff6a371a075e.PNG">
+ <img width="297" alt="vector_field_bivariate" src="https://user-images.githubusercontent.com/56837271/134482911-2d9807a0-af12-46c5-8bee-6c1e31266793.PNG">
 </p>  
 
- ## Notes
+
+## Contact
+For reporting bugs or suggesting new features, Contact divin.pulakudiyil@st.ovgu.de or resam.makvandi@ovgu.de  
+
+## Version history
+
+### v1.0
+Release date: 23 Spetember 2021
+
+
+## Notes
  
  The files are avaialable inside `paraview` folder on the destination. if the destination path is not given then the files are avaialble in `working directory`  
  Parallel processing is implimented using `cuncurrent.futures` module and is favourable if the number of time steps is more
