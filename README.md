@@ -53,6 +53,11 @@ For reporting bugs or suggesting new features, Contact divin.pulakudiyil@st.ovgu
 ### v1.0
 Release date: 23 Spetember 2021
 
+## References
+
+- M. J. Borden, M. A. Scott, J. A. Evans, and T. J. R. Hughes, "Isogeometric finite elementdata structures based on bezier extraction of NURBS,"International Journal for NumericalMethods in Engineering, vol. 87, 2011   
+- Makvandi, Resam, Venghaus, Henning, & Juhre, Daniel. (2020). NPVI add-on for FEAP (v1.4). Zenodo. https://doi.org/10.5281/zenodo.3945132   
+- Github, qd python library for CAE, 2019. https://github.com/qd-cae/qd-cae-python   
 
 ## Notes
  
