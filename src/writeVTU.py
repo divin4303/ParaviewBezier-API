@@ -167,7 +167,7 @@ class writeVTU:
         
         myfile.write('\n</Cells>')
         
-        myfile.write('\n<PointData>')
+        myfile.write('\n<PointData RationalWeights="RationalWeights">')
     
     # ======================================================================
         myfile.write('\n<DataArray type="%s" Name="%s" format="ascii">'%('Float64', 'RationalWeights'))
